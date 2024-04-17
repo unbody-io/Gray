@@ -34,3 +34,4 @@ Nextlog invites developers and content creators to enhance global reading experi
 ## License
 
 Licensed under the [MIT license](https://github.com/nextui-org/next-pages-template/blob/main/LICENSE).
+# Nextlog
