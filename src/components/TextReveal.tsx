@@ -73,7 +73,7 @@ export const TextReveal = ({ children, onTransitionEnd, withDefaultSkeleton}: Pr
 
     return (
         <div ref={ref} className="relative">
-            <div className={`transition-all ${render||withDefaultSkeleton? 'opacity-1' : 'opacity-0'}`}>
+            <div className={`transition-all  ${render||withDefaultSkeleton? 'opacity-1' : 'opacity-0'}`}>
                 {children}
             </div>
             {

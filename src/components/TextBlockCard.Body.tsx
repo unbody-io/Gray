@@ -17,7 +17,7 @@ export const TextBlockCardBody = (props: Props) => {
     const doc = block.document[0];
 
     return (
-        <div className={clsx(["flex flex-col justify-between h-full text-sm", className])} {...rest}>
+        <div className={clsx(["flex  flex-col justify-between h-full text-sm", className])} {...rest}>
                 <CardHeader className="flex-col items-start mb-0 pb-0">
                     <div className="flex gap-2 justify-center align-middle text-tiny text-gray-500">
                         Paragraph

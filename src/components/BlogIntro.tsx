@@ -17,9 +17,9 @@ type Props = {
 export const BlogIntro = (props: Props) => {
     const {topics, text, keywords, entities, isStackOpen} = props;
     return (
-        <div className={`${isStackOpen ? "blur-md" : ""} transition-all ease-linear duration-1000 min-h-[160px]`}>
+        <div className={`${isStackOpen ? "blur-md" : ""} transition-all max-w-sm p-4 lg:max-w-full sm:max-w-full text-left leading-relaxed  text-center  ease-linear duration-1000 min-h-[160px]`}>
             <TextReveal>
-                <InteractiveParagraph text={text}
+                <InteractiveParagraph  text={text}
                                       alwaysActive={true}
                                       tags={[
                                           ...topics.map((topic) => transformTag(topic, 'topics', ESearchMode.Search)),
