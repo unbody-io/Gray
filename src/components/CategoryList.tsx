@@ -37,7 +37,7 @@ export const CategoryList = ({categories, onOpen, onClosed}: CategoryListProps) 
     return (
         <>
             {
-                <div className={"flex flex-col gap-16 transition-all duration-750 ease-in-out"}
+                <div className={"flex  flex-col gap-16 transition-all duration-750 ease-in-out"}
                      ref={ref}
                      style={{
                          transform: `translateY(${translateY}px)`

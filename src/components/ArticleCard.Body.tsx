@@ -16,7 +16,7 @@ type ArticleCardProps = {
 export const ArticleCardBody = (props: ArticleCardProps) => {
     const {data: article} = props;
     return (
-        <div className={"flex flex-row overflow-hidden  align-top"}>
+        <div className={"flex max-w-md lg:max-w-full  flex-row overflow-hidden  align-top"}>
             <div className={"p-3 lg:mt-0 flex items-center justify-center"}>
                 <ArticleIcon className={"text-black/50  fill-black/30"}
                              size={10}
@@ -36,12 +36,12 @@ export const ArticleCardBody = (props: ArticleCardProps) => {
                                                         </span>
                         }
                     </div>
-                    <h4 className="font-normal text-md lg:max-w-md max-w-[220px] truncate mb-0 break-words  pb-0">
+                    <h4 className="font-normal  text-md lg:max-w-full max-w-[220px] truncate mb-0 break-words  pb-0">
                         {article.title as string}
                     </h4>
                 </CardHeader>
-                <CardFooter className={"justify-between mb-2 flex flex-col lg:flex-row max-w-[220px] lg:max-w-lg  pt-0 pb-0 lg:mb-0"}>
-                    <p className="overflow-clip text-gray-500 text-tiny lg:max-w-lg    truncate">
+                <CardFooter className={"justify-between   mb-2 flex max-w-sm flex-col  lg:flex-row lg:max-w-full  pt-0 pb-0 lg:mb-0"}>
+                    <p className="lg:overflow-clip  max-w-full text-gray-500 text-tiny lg:max-w-lg truncate">
                         {
                             (article.subtitle ? article.subtitle : article.summary) as string
                         }

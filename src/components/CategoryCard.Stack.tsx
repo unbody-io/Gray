@@ -55,7 +55,7 @@ export const CategoryCardStack = (props: Props) => {
             {
                 articles.map((article, i) => (
                     <ArticleCard key={`a-${i}`}
-                                 className={`${isOpen ? "bg-gray-200" : "bg-default-200/100"}`}
+                                 className={`${isOpen ? "bg-gray-200" : "bg-default-200/100 lg:max-w-full max-w-sm"}`}
                     >
                         {
                             isOpen &&
@@ -65,7 +65,7 @@ export const CategoryCardStack = (props: Props) => {
                 ))
             }
             <ArticleCard
-                className={`p-6 ${isOpen? "bg-content1": "bg-default-200/100"}`}
+                className={`p-6 ${isOpen? "bg-content1": "bg-default-200/100 lg:max-w-full max-w-sm"}`}
                 style={{
                     height: isOpen ? "auto" : "auto",
                     overflow: isOpen ? "auto" : "hidden",
@@ -73,7 +73,7 @@ export const CategoryCardStack = (props: Props) => {
                 {
                     isOpen &&
                     <div>
-                        <div className={"text-sm pb-4"}>Related content blocks</div>
+                        <div className={"text-sm pb-4 text-center lg:text-left "}>Related content blocks</div>
                         <BlockList payload={{data: blocks, isLoading: false, error: undefined} as SWRResponse<MiniTextBlock[], any>}
                                    pageSize={2}
                         />

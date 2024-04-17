@@ -15,13 +15,13 @@ export const BlockList = (props: ArticleListProps) => {
     const [page, setPage] = React.useState(1);
 
     return (
-        <div>
+        <div className="">
             {isLoading && <div>Loading...</div>}
             {error && <div>Error</div>}
             {
                 data && !isLoading &&
                 <div className={"flex flex-col gap-4"}>
-                    <div className={"grid gap-6 grid-cols-2"}>
+                    <div className={"grid  gap-6 grid-row lg:grid-cols-2"}>
                         {
                             data
                                 .slice(0, page * pageSize)

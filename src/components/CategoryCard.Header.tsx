@@ -25,7 +25,7 @@ export type UseCatHeadAnimationsState = {
 
 
 const Status = ({children}: PropsWithChildren) => (
-    <div className="text-tiny text-gray-500 flex-row flex">
+    <div className="text-tiny  text-gray-500 flex-row flex">
         {children}
     </div>
 )
@@ -39,7 +39,7 @@ const StatusSkeleton = () => (
 )
 
 const TitleSkeleton = () => (
-    <LineSkeleton className={"w-3/5 h-5 bg-gray-200"}/>
+    <LineSkeleton className={" w-3/5 h-5 bg-gray-200"}/>
 )
 
 const FooterSkeleton = () => (
