@@ -267,7 +267,6 @@ const generateReadPage = async (
 };
 
 const askOnGoogleDocs = async (question: string): Promise<string> => {
-  // ! error:  unbody.get.googleDoc.ask is marked as not promise.
   const query = await unbody.get.googleDoc.ask(question);
 
   const {
@@ -282,7 +281,6 @@ const askOnTextBlocks = async <T>(
   select: (keyof Omit<TextBlock, "__typename" | "_additional">)[] = [
     "order",
     "html",
-    // ! error: not assignable to type '"document" | "footnotes" | "html" | "order" | "remoteId" | "sourceId" | "tagName" | "text" | "classNames"'.
     "document.GoogleDoc.slug",
     "document.GoogleDoc.title",
   ],
@@ -297,10 +295,9 @@ const askOnTextBlocks = async <T>(
   const {
     data: { payload },
   } = await query.exec();
-  const topAnswer =
-    payload[0]._additional?.answer?.hasAnswer
-      ? payload[0]
-      : null;
+  const topAnswer = payload[0]._additional?.answer?.hasAnswer
+    ? payload[0]
+    : null;
 
   return topAnswer || null;
 };

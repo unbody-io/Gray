@@ -159,6 +159,7 @@ export default function ReadPage(
       setPages([...pages, data]);
     } catch (e) {
       setPagesError("Error generating page. Please try again.");
+      setPagesLoading(false);
       console.log(e);
     }
   };
