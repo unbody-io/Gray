@@ -26,6 +26,7 @@
     "intl-messageformat": "^10.5.0",
     "next": "^14.1.0",
     "next-themes": "^0.2.1",
+    "nprogress": "^0.2.0",
     "postcss": "8.4.31",
     "react": "18.2.0",
     "react-dom": "18.2.0",
@@ -37,6 +38,7 @@
     "typewriter-effect": "^2.21.0"
   },
   "devDependencies": {
+    "@types/nprogress": "^0.2.3",
     "@types/react-imgix": "^9.5.3",
     "dotenv": "^16.4.5",
     "ts-node": "^10.9.2",
