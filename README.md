@@ -26,9 +26,16 @@ https://github.com/unbody-io/Nexlog/assets/7159454/6d350499-7ed1-4212-b310-cb187
 - [next-themes](https://github.com/pacocoursey/next-themes)
 
 ## How to Use
-*Coming soon*
+In order to get this to work, you need 
+1. Setup an account on Unbody.io.
+2. Create a new project and add Google Drive as a source (make sure to enable all "Auto" fields as well as `Generative-search` feature
+3. Currently this code-base only works with GoogleDocs in a folder on Google Drive, so you need to have your posts in form of Google Docs
+4. Once source is initialized, you can create a API key and together with your project ID, you need to add them to the `.env.local`
+5. It's all ready 
 ```bash
-
+yarn dev
+yarn build
+yarn start
 ```
 
 ## Open Source Community
