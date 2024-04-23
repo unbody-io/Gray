@@ -2,6 +2,9 @@
 
 AI has transformed writing, and now it's time to enhance reading. Nextlog is an AI-native, open-source blogging framework built on [Unbody.io](Unbody.io) that makes reading more contextual and dynamic. Designed for both content creators and readers, Nextlog brings articles to life, turning reading into an interactive, personalized experience.
 
+https://github.com/unbody-io/Nexlog/assets/7159454/6d350499-7ed1-4212-b310-cb18734929a8
+
+
 ## Purpose:
 1. **Exploration and Experimentation**: Nextlog uses AI to explore new ways of engaging readers, adapting content to their context and preferences.
 2. **Dynamic and Contextual Reading**: Nextlog aims to personalize the reading experience, making content feel specifically tailored and relevant to each user.
