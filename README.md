@@ -1,6 +1,6 @@
-# Nextlog
+# Nexlog
 
-AI has transformed writing, and now it's time to enhance reading. Nextlog is an AI-native, open-source blogging framework built on [Unbody.io](Unbody.io) that makes reading more contextual and dynamic. Designed for both content creators and readers, Nextlog brings articles to life, turning reading into an interactive, personalized experience.
+AI has transformed writing, and now it's time to enhance reading. Nexlog is an AI-native, open-source blogging framework built on [Unbody.io](Unbody.io) that makes reading more contextual and dynamic. Designed for both content creators and readers, Nextlog brings articles to life, turning reading into an interactive, personalized experience.
 
 https://github.com/unbody-io/Nexlog/assets/7159454/6d350499-7ed1-4212-b310-cb18734929a8
 
