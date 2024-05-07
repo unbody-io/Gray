@@ -2,28 +2,25 @@
 @tailwind components;
 @tailwind utilities;
 
-
-
-
-.chip{
+.chip {
     @apply rounded-full capitalize text-center relative max-w-fit min-w-min inline-flex items-center justify-between box-border whitespace-nowrap bg-transparent py-0;
     transition: all 250ms;
     height: 1.2rem;
 }
 
-.chip-content{
+.chip-content {
     @apply flex-1 text-inherit font-normal h-fit;
     transition: all 250ms;
 }
 
-.active .chip{
+.active .chip {
 }
-.active .chip-content{
+.active .chip-content {
     @apply scale-80 px-[1px] py-0;
-
 }
 
-.active .chip-topics, .active .chip-keywords{
+.active .chip-topics,
+.active .chip-keywords {
     @apply bg-default/40 text-default-foreground;
 }
 
@@ -31,7 +28,6 @@
     @apply bg-primary/40 text-default-foreground;
 }
 
-
-em{
+em {
     @apply text-primary;
 }

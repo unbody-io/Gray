@@ -1,34 +1,34 @@
-import {SiteConfigs, SiteData} from "@/types/data.types";
-import {createContext, ReactNode, useContext, useState} from "react";
+import { SiteConfigs, SiteData } from '@/types/data.types';
+import { createContext, ReactNode, useContext, useState } from 'react';
 
-import siteConfig from "../../site.config.json";
-import siteData from "../../site.data.json";
+import siteConfig from '../../site.config.json';
+import siteData from '../../site.data.json';
 
 type ContextSiteDataState = {
-    siteData: SiteData|undefined;
-    siteConfig: SiteConfigs|undefined;
-}
+    siteData: SiteData | undefined;
+    siteConfig: SiteConfigs | undefined;
+};
 
 const initialState: ContextSiteDataState = {
     // @ts-ignore
     siteData: siteData as SiteData,
     siteConfig: siteConfig as SiteConfigs
-}
+};
 
-const SiteDataContext = createContext(initialState)
+const SiteDataContext = createContext(initialState);
 
-export const SiteDataProvider = ({children}: {children: ReactNode}) => {
+export const SiteDataProvider = ({ children }: { children: ReactNode }) => {
     return (
         <SiteDataContext.Provider value={initialState}>
             {children}
         </SiteDataContext.Provider>
-    )
-}
+    );
+};
 
 export const useSiteData = () => {
-    const context = useContext(SiteDataContext)
+    const context = useContext(SiteDataContext);
     if (context === undefined) {
-        throw new Error('useSiteData must be used within a SiteDataProvider')
+        throw new Error('useSiteData must be used within a SiteDataProvider');
     }
-    return context
-}
+    return context;
+};

@@ -1,19 +1,26 @@
-import React, {useState, useRef, useEffect} from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import clsx from 'clsx';
 
-
 type Props = {
-    onOpen?: () => void
-    openIndex?: number
-    index: number
-    children: React.ReactNode
-    height?: number
-    maxStackSize?: number
-    gap?: number
-}
+    onOpen?: () => void;
+    openIndex?: number;
+    index: number;
+    children: React.ReactNode;
+    height?: number;
+    maxStackSize?: number;
+    gap?: number;
+};
 
 export const CardStack = (props: Props) => {
-    const {onOpen, openIndex = -1, index, children, height = 100, maxStackSize = 3, gap=30} = props
+    const {
+        onOpen,
+        openIndex = -1,
+        index,
+        children,
+        height = 100,
+        maxStackSize = 3,
+        gap = 30
+    } = props;
 
     const isOneOfStacksOpen = openIndex > -1;
     const isOpen = openIndex === index;
@@ -25,7 +32,10 @@ export const CardStack = (props: Props) => {
     const onMouseLeave = () => setHovering(false);
 
     const childCount = React.Children.count(children);
-    const childArray = React.Children.toArray(children).slice(0, isOpen?childCount:maxStackSize);
+    const childArray = React.Children.toArray(children).slice(
+        0,
+        isOpen ? childCount : maxStackSize
+    );
 
     const [totalHeightOfChildren, setTotalHeightOfChildren] = useState(0);
     useEffect(() => {
@@ -34,67 +44,61 @@ export const CardStack = (props: Props) => {
             ref.current.childNodes.forEach((child) => {
                 totalHeight += (child as HTMLElement).offsetHeight;
             });
-            setTotalHeightOfChildren(totalHeight + childCount*gap);
+            setTotalHeightOfChildren(totalHeight + childCount * gap);
         }
     }, [childArray.length]);
 
     const getTopWhenOpen = (index: number) => {
-        return (index) * (height - 10) + gap;
-    }
+        return index * (height - 10) + gap;
+    };
     const getTopWhenClosed = (index: number) => {
         return hovering ? index * 10 : index * 7;
-    }
+    };
     const getLeft = (index: number) => {
         return index * 3;
-    }
+    };
 
     return (
         <div
             className={clsx([
-                "transition-all ease-in-out duration-700",
-                `${isOpen ? "drop-shadow-2xl py-6 px-4" : "drop-shadow-lg"}`,
-                `${isOneOfStacksOpen && !isOpen ? "blur-lg opacity-30" : "opacity-100"}`
+                'transition-all ease-in-out duration-700',
+                `${isOpen ? 'drop-shadow-2xl py-6 px-4' : 'drop-shadow-lg'}`,
+                `${isOneOfStacksOpen && !isOpen ? 'blur-lg opacity-30' : 'opacity-100'}`
             ])}
             style={{
-                minHeight: isOpen ? `${((childCount) * (height)) + gap+10}px` : `${height}px`,
+                minHeight: isOpen ? `${childCount * height + gap + 10}px` : `${height}px`,
                 height: isOpen ? `${totalHeightOfChildren}px` : `${height}px`,
-                zIndex: isOpen? 99999: index,
+                zIndex: isOpen ? 99999 : index
             }}
             onMouseEnter={onMouseEnter}
             onMouseLeave={onMouseLeave}
         >
             <div
-                className={"relative transition-all ease-in-out duration-700"}
+                className={'relative transition-all ease-in-out duration-700'}
                 ref={ref}
                 style={{
-                    transform: `scale(${hovering && !isOneOfStacksOpen ? 1.05 : 1})`,
+                    transform: `scale(${hovering && !isOneOfStacksOpen ? 1.05 : 1})`
                 }}
             >
-                {
-                    childArray
-                        .map((child, _index) => {
-                            if (!React.isValidElement(child)) return child;
-                            const {className, style, ...rest} = child.props;
+                {childArray.map((child, _index) => {
+                    if (!React.isValidElement(child)) return child;
+                    const { className, style, ...rest } = child.props;
 
-                            return (
-                                    React.cloneElement(child, {
-                                        className: clsx([
-                                            "absolute w-full",
-                                            className
-                                        ]),
-                                        style: {
-                                            top: `${isOpen ? getTopWhenOpen(_index) : getTopWhenClosed(_index)}px`,
-                                            left: `${(hovering || isOpen) ? 0 : getLeft(_index)}px`,
-                                            minHeight: `${isOpen ? height - 30 : height}px`,
-                                            zIndex: childCount + 1 - _index,
-                                            transition: 'all 0.3s ease-in-out',
-                                            ...style,
-                                        },
-                                        ...rest,
-                                    })
-                            )
-                        })
-                }
+                    return React.cloneElement(child, {
+                        className: clsx(['absolute w-full', className]),
+                        style: {
+                            top: `${
+                                isOpen ? getTopWhenOpen(_index) : getTopWhenClosed(_index)
+                            }px`,
+                            left: `${hovering || isOpen ? 0 : getLeft(_index)}px`,
+                            minHeight: `${isOpen ? height - 30 : height}px`,
+                            zIndex: childCount + 1 - _index,
+                            transition: 'all 0.3s ease-in-out',
+                            ...style
+                        },
+                        ...rest
+                    });
+                })}
             </div>
         </div>
     );

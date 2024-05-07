@@ -1,52 +1,51 @@
-import {Unbody} from "@unbody-io/ts-client";
-import {introPrompt} from "@/utils/prompt-templates/prompt.template.intro";
-import {categoriesPrompt} from "@/utils/prompt-templates/prompt.template.categories";
-import {testEntities, testTopics} from "@/utils/test-data";
+import { Unbody } from '@unbody-io/ts-client';
+import { introPrompt } from '@/utils/prompt-templates/prompt.template.intro';
+import { categoriesPrompt } from '@/utils/prompt-templates/prompt.template.categories';
 import {
-    AutoFields, AutoFieldsRaw,
+    AutoFields,
+    AutoFieldsRaw,
     CategoryRaw,
-    NameEntity,
     QueryContextItem,
     ReadPageData,
     ReadPageResponse,
-    SearchContextResponse,
-    Topic
-} from "@/types/data.types";
-import {searchContextPrompt} from "@/utils/prompt-templates/prompt.template.topic";
-import {IGoogleDoc} from "@unbody-io/ts-client/build/core/documents";
-import {TextBlock} from "@unbody-io/ts-client/build/types/TextBlock.types";
-import {readContextPrompt} from "@/utils/prompt-templates/prompt.template.read-blocks";
+    SearchContextResponse
+} from '@/types/data.types';
+import { searchContextPrompt } from '@/utils/prompt-templates/prompt.template.topic';
+import { IGoogleDoc } from '@unbody-io/ts-client/build/core/documents';
+import { TextBlock } from '@unbody-io/ts-client/build/types/TextBlock.types';
+import { readContextPrompt } from '@/utils/prompt-templates/prompt.template.read-blocks';
 
 if (!process.env.UNBODY_API_KEY || !process.env.UNBODY_PROJECT_ID) {
-    throw new Error("UNBODY_API_KEY and UNBODY_PROJECT_ID must be set");
+    throw new Error('UNBODY_API_KEY and UNBODY_PROJECT_ID must be set');
 }
 
 export const unbody = new Unbody({
     apiKey: process.env.UNBODY_API_KEY,
-    projectId: process.env.UNBODY_PROJECT_ID,
-})
+    projectId: process.env.UNBODY_PROJECT_ID
+});
 
 export const getAutoFields = async (): Promise<AutoFields> => {
-    const {data: {payload}} = await unbody.get
-        .googleDoc
-        .select("autoKeywords", "autoEntities", "autoTopics")
-        .group(0.1, "closest")
-        .exec()
+    const {
+        data: { payload }
+    } = await unbody.get.googleDoc
+        .select('autoKeywords', 'autoEntities', 'autoTopics')
+        .group(0.1, 'closest')
+        .exec();
 
     const entities = (payload as AutoFieldsRaw[])
-        .flatMap(({autoEntities}) => autoEntities)
+        .flatMap(({ autoEntities }) => autoEntities)
         .filter((e) => e !== null);
     const uniqueEntities = Array.from(new Set(entities));
 
     // we exclude entities from topics
     const topics = (payload as AutoFieldsRaw[])
-        .flatMap(({autoTopics}) => autoTopics)
+        .flatMap(({ autoTopics }) => autoTopics)
         .filter((t) => t && !uniqueEntities.includes(t));
     const uniqueTopics = Array.from(new Set(topics));
 
     // excluding both entities and topics from keywords
     const keywords = (payload as AutoFieldsRaw[])
-        .flatMap(({autoKeywords}: { autoKeywords: string[] | null }) => autoKeywords)
+        .flatMap(({ autoKeywords }: { autoKeywords: string[] | null }) => autoKeywords)
         .filter((k) => k && !uniqueEntities.includes(k) && !uniqueTopics.includes(k));
 
     const uniqueKeywords = Array.from(new Set(keywords));
@@ -56,238 +55,268 @@ export const getAutoFields = async (): Promise<AutoFields> => {
         topics: uniqueTopics as string[],
         keywords: uniqueKeywords as string[]
     };
-}
+};
 
-const generateBlogIntro = async (entities: string[], topics: string[]): Promise<string> => {
-    const {data: {generate: {result}}} = await unbody
-        .get
-        .googleDoc
-        .select("title")
+const generateBlogIntro = async (
+    entities: string[],
+    topics: string[]
+): Promise<string> => {
+    const {
+        data: {
+            generate: { result }
+        }
+    } = await unbody.get.googleDoc
+        .select('title')
         .limit(15)
-        .generate
-        .fromMany(
-            introPrompt.create(entities, topics),
-            ["title", "autoSummary"]
-        )
+        .generate.fromMany(introPrompt.create(entities, topics), ['title', 'autoSummary'])
         .exec();
 
     return introPrompt.parse(result);
-}
+};
 
-const generateCategories = async (topics: string[], entities: string[]): Promise<CategoryRaw[]> => {
-    const {data: {generate: {result}}} =
-        await unbody.get
-            .googleDoc
-            .select("title")
-            .limit(15)
-            .generate
-            .fromMany(
-                categoriesPrompt.create(topics, entities),
-                ["title", "autoSummary"]
-            )
-            .exec();
+const generateCategories = async (
+    topics: string[],
+    entities: string[]
+): Promise<CategoryRaw[]> => {
+    const {
+        data: {
+            generate: { result }
+        }
+    } = await unbody.get.googleDoc
+        .select('title')
+        .limit(15)
+        .generate.fromMany(categoriesPrompt.create(topics, entities), [
+            'title',
+            'autoSummary'
+        ])
+        .exec();
     return categoriesPrompt.parse(result);
-}
+};
 
 const searchAboutOnGoogleDocs = async <T>(
-    q: string|undefined = "",
+    q: string | undefined = '',
     entities: string[] = [],
     topics: string[] = [],
     keywords: string[] = [],
-    select: (keyof IGoogleDoc)[] = ["title", "slug", "summary", "modifiedAt", "subtitle"],
+    select: (keyof IGoogleDoc)[] = ['title', 'slug', 'summary', 'modifiedAt', 'subtitle'],
     minScore = 0.5
 ): Promise<T[]> => {
     let query = unbody.get.googleDoc.select(...select);
 
     const tags = [
-        ...entities.map(e => ({value: e, type: "autoEntities"})),
-        ...topics.map(t => ({value: t, type: "autoTopics"})),
-        ...keywords.map(k => ({value: k, type: "autoKeywords"}))
-    ]
+        ...entities.map((e) => ({ value: e, type: 'autoEntities' })),
+        ...topics.map((t) => ({ value: t, type: 'autoTopics' })),
+        ...keywords.map((k) => ({ value: k, type: 'autoKeywords' }))
+    ];
 
     if (tags.length > 0) {
         // @ts-ignore
-        query = query.where(({Or, ContainsAny}) => {
+        query = query.where(({ Or, ContainsAny }) => {
             return Or(
-                ...tags.map(({value, type}) => ({
+                ...tags.map(({ value, type }) => ({
                     [type]: ContainsAny(value)
                 }))
-            )
-        })
+            );
+        });
     }
 
     if (q.trim().length > 0) {
         // @ts-ignore
-        query = query.search.about(q, {certainty: minScore})
+        query = query.search.about(q, { certainty: minScore });
     }
 
-    const {data: {payload}} = await query.exec();
-    return payload
-}
+    const {
+        data: { payload }
+    } = await query.exec();
+    return payload;
+};
 
 const searchAboutOnTextBlocks = async <T>(
     q: string | string[],
     // @ts-ignore
-    select: (keyof Omit<TextBlock, "__typename" | "_additional">)[] = ["order", "html", "document.GoogleDoc.slug"],
+    select: (keyof Omit<TextBlock, '__typename' | '_additional'>)[] = [
+        'order',
+        'html',
+        'document'
+    ],
     minScore = 0.6
 ): Promise<T[]> => {
-    const query = unbody.get
-        .textBlock
-        .where(({NotEqual, And, ContainsAny}) => {
+    const query = unbody.get.textBlock
+        .where(({ NotEqual, And, ContainsAny }) => {
             return And(
-                {tagName: NotEqual("h1")},
-                {tagName: NotEqual("h2")},
-                {tagName: NotEqual("h3")},
-                {classNames: NotEqual("title")},
-            )
+                { tagName: NotEqual('h1') },
+                { tagName: NotEqual('h2') },
+                { tagName: NotEqual('h3') },
+                { classNames: NotEqual('title') }
+            );
         })
         .select(...select)
-        .search
-        .about(q, {certainty: minScore});
+        .search.about(q, { certainty: minScore });
 
-    const {data: {payload}} = await query.exec();
+    const {
+        data: { payload }
+    } = await query.exec();
     return payload;
-}
+};
 
-const generateSearchContext = async (contextItems: QueryContextItem[] = [], q?: string): Promise<SearchContextResponse> => {
-    const searchMethod = contextItems.length === 0 ? "hybrid" : "hybrid";
-    const searchQuery = contextItems.length === 0 && q ? q : contextItems.map(({value}) => value).join(", ");
+const generateSearchContext = async (
+    contextItems: QueryContextItem[] = [],
+    q?: string
+): Promise<SearchContextResponse> => {
+    const searchMethod = contextItems.length === 0 ? 'hybrid' : 'hybrid';
+    const searchQuery =
+        contextItems.length === 0 && q
+            ? q
+            : contextItems.map(({ value }) => value).join(', ');
 
-    const query = unbody.get
-        .textBlock
-        .select("remoteId", "text")
+    const query = unbody.get.textBlock
+        .select('remoteId', 'text')
         .search[searchMethod](searchQuery)
         .limit(10)
-        .generate
-        .fromMany(
-            searchContextPrompt.create(contextItems, q),
-            ["text"]
-        );
+        .generate.fromMany(searchContextPrompt.create(contextItems, q), ['text']);
 
-    const {data: {generate: {result}}} = await query.exec();
+    const {
+        data: {
+            generate: { result }
+        }
+    } = await query.exec();
     return searchContextPrompt.parse<SearchContextResponse>(result);
-}
+};
 
-
-const generateReadPage = async (contextItems: QueryContextItem[] = [], prevPages: ReadPageData[] = [], q: string = ""): Promise<ReadPageResponse> => {
-    const searchMethod = contextItems.length === 0 ? "about" : "about";
-    const searchQuery = contextItems.length === 0 && q ? q : contextItems.map(({value}) => value).join(", ");
+const generateReadPage = async (
+    contextItems: QueryContextItem[] = [],
+    prevPages: ReadPageData[] = [],
+    q: string = ''
+): Promise<ReadPageResponse> => {
+    const searchMethod = contextItems.length === 0 ? 'about' : 'about';
+    const searchQuery =
+        contextItems.length === 0 && q
+            ? q
+            : contextItems.map(({ value }) => value).join(', ');
     const emptyQuery = searchQuery.trim().length === 0;
 
-    let query = unbody.get
-        .textBlock
+    let query = unbody.get.textBlock
         // @ts-ignore
-        .select("text", "document.GoogleDoc.slug", "document.GoogleDoc.title", "order", "tagName", "classNames")
-        .where(({And, NotEqual}) => {
+        .select('text', 'document', 'document', 'order', 'tagName', 'classNames')
+        .where(({ And, NotEqual }) => {
             return And(
-                {tagName: NotEqual("h1")},
-                {tagName: NotEqual("h2")},
-                {tagName: NotEqual("h3")},
-                {classNames: NotEqual("title")},
-                {classNames: NotEqual("subtitle")},
-                ...prevPages.flatMap(({from}) => {
-                    return from.map(({order, document}) => {
+                { tagName: NotEqual('h1') },
+                { tagName: NotEqual('h2') },
+                { tagName: NotEqual('h3') },
+                { classNames: NotEqual('title') },
+                { classNames: NotEqual('subtitle') },
+                ...prevPages.flatMap(({ from }) => {
+                    return from.map(({ order, document }) => {
                         return And(
-                            {order: NotEqual(order)},
-                            {document: {GoogleDoc: {slug: NotEqual(document[0].slug)}}}
-                        )
-                    })
+                            { order: NotEqual(order) },
+                            {
+                                document: {
+                                    GoogleDoc: { slug: NotEqual(document[0].slug) }
+                                }
+                            }
+                        );
+                    });
                 })
-            )
-        })
+            );
+        });
 
-    if(!emptyQuery) {
+    if (!emptyQuery) {
         // @ts-ignore
-        query = query.search[searchMethod](searchQuery)
+        query = query.search[searchMethod](searchQuery);
     }
 
-
     const lastPage = prevPages.length > 0 ? prevPages[prevPages.length - 1] : null;
-    const lastBlock = lastPage? lastPage.from[lastPage.from.length - 1] : null;
+    const lastBlock = lastPage ? lastPage.from[lastPage.from.length - 1] : null;
 
-    const {data: {generate}} = await query
+    const {
+        data: { generate }
+    } = await query
         .limit(3)
-        .generate
-        .fromMany(
+        .generate.fromMany(
             readContextPrompt.create(contextItems, q, lastBlock, prevPages.length === 0),
-            ["text"]
+            ['text']
         )
         .exec();
     return generate;
-}
-
+};
 
 const askOnGoogleDocs = async (question: string): Promise<string> => {
-    const query = await unbody.get
-        .googleDoc
-        .ask(question);
+    const query = await unbody.get.googleDoc.ask(question);
 
-    const {data: {payload}} = await query.exec();
+    const {
+        data: { payload }
+    } = await query.exec();
     return payload;
-}
+};
 
 const askOnTextBlocks = async <T>(
     question: string,
     // @ts-ignore
-    select: (keyof Omit<TextBlock, "__typename" | "_additional">)[] = ["order", "html", "document.GoogleDoc.slug", "document.GoogleDoc.title"],
+    select: (keyof Omit<TextBlock, '__typename' | '_additional'>)[] = [
+        'order',
+        'html',
+        'document',
+        'document'
+    ],
     minScore = 0.7
 ): Promise<T | null> => {
-    const query = await unbody.get
-        .textBlock
+    const query = await unbody.get.textBlock
         .select(...select)
-        .additional("certainty")
+        .additional('certainty')
         .ask(question);
 
-    const {data: {payload}} = await query.exec();
-    const topAnswer = (
-        payload[0]._additional.answer
-        && payload[0]._additional.answer.hasAnswer
-    ) ? payload[0] : null;
+    const {
+        data: { payload }
+    } = await query.exec();
+    const topAnswer =
+        payload[0]._additional.answer && payload[0]._additional.answer.hasAnswer
+            ? payload[0]
+            : null;
 
     return topAnswer || null;
-}
+};
 
 const getPost = async (slug: string): Promise<IGoogleDoc | null> => {
-    const query = unbody.get
-        .googleDoc
-        .where({slug})
-        .select(
-            "title",
-            "autoTopics",
-            "autoSummary",
-            "autoKeywords",
-            "autoEntities",
-            "title",
-            "slug",
-            "subtitle",
-            "toc",
-            "modifiedAt",
-            //@ts-ignore
-            "blocks.TextBlock.order",
-            "blocks.TextBlock.html",
-            "blocks.TextBlock.text",
-            "blocks.TextBlock.tagName",
-            "blocks.TextBlock.classNames",
-            "blocks.ImageBlock.order",
-            "blocks.ImageBlock.width",
-            "blocks.ImageBlock.height",
-            "blocks.ImageBlock.url",
-            "blocks.ImageBlock.title",
-            "blocks.ImageBlock.alt",
-            "blocks.ImageBlock.__typename",
-            "blocks.TextBlock.__typename",
-            "mentions"
-        )
-    const {data: {payload}} = await query.exec();
+    const query = unbody.get.googleDoc.where({ slug }).select(
+        'title',
+        'autoTopics',
+        'autoSummary',
+        'autoKeywords',
+        'autoEntities',
+        'title',
+        'slug',
+        'subtitle',
+        'toc',
+        'modifiedAt',
+        //@ts-ignore
+        'blocks.TextBlock.order',
+        'blocks.TextBlock.html',
+        'blocks.TextBlock.text',
+        'blocks.TextBlock.tagName',
+        'blocks.TextBlock.classNames',
+        'blocks.ImageBlock.order',
+        'blocks.ImageBlock.width',
+        'blocks.ImageBlock.height',
+        'blocks.ImageBlock.url',
+        'blocks.ImageBlock.title',
+        'blocks.ImageBlock.alt',
+        'blocks.ImageBlock.__typename',
+        'blocks.TextBlock.__typename',
+        'mentions'
+    );
+    const {
+        data: { payload }
+    } = await query.exec();
     return payload[0] || null;
-}
+};
 
 const getPostSlugs = async (): Promise<string[]> => {
-    const query = unbody.get.googleDoc.select("slug");
-    const {data: {payload}} = await query.exec();
-    return (payload as IGoogleDoc[]).map(({slug}) => slug as string);
-}
-
+    const query = unbody.get.googleDoc.select('slug');
+    const {
+        data: { payload }
+    } = await query.exec();
+    return (payload as IGoogleDoc[]).map(({ slug }) => slug as string);
+};
 
 export const unbodyService = {
     generateBlogIntro,
@@ -301,4 +330,4 @@ export const unbodyService = {
     getPostSlugs,
     getAutoFields,
     generateReadPage
-}
+};

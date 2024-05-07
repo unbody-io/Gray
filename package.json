@@ -37,8 +37,12 @@
     "typewriter-effect": "^2.21.0"
   },
   "devDependencies": {
+    "@next/eslint-plugin-next": "^14.2.3",
     "@types/react-imgix": "^9.5.3",
     "dotenv": "^16.4.5",
+    "eslint": "8.55.0",
+    "eslint-config-next": "^14.2.3",
+    "eslint-config-prettier": "^9.1.0",
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
     "typescript": "^5.4.3"

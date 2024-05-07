@@ -9,7 +9,7 @@ export const useTypingEffect = (value: string) => {
 
         const intervalId = setInterval(() => {
             setIsAnimating(true);
-            setText(prev => {
+            setText((prev) => {
                 if (i === value.length) {
                     clearInterval(intervalId);
 
