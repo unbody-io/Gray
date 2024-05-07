@@ -14,6 +14,6 @@ export type PromptInput = {
 
 export type PromptTemplate = {
     create: (...args: any) => string;
-    parse: <T extends any>(rawResult: string) => T;
+    parse: <T>(rawResult: string) => T;
     transform?: (data: any) => any;
 };

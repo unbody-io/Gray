@@ -1,5 +1,5 @@
 import { SiteConfigs, SiteData } from '@/types/data.types';
-import { createContext, ReactNode, useContext, useState } from 'react';
+import { createContext, ReactNode, useContext } from 'react';
 
 import siteConfig from '../../site.config.json';
 import siteData from '../../site.data.json';

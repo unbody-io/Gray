@@ -1,13 +1,10 @@
 {
     "parser": "@typescript-eslint/parser",
     "extends": [
-        "airbnb",
         "plugin:@typescript-eslint/recommended",
         "plugin:react/recommended",
         "prettier",
-        "next/core-web-vitals",
-        "plugin:testing-library/react",
-        "plugin:jest-dom/recommended"
+        "next/core-web-vitals"
     ],
     "plugins": ["react", "react-hooks", "@typescript-eslint", "prettier"],
     "env": {
@@ -34,7 +31,7 @@
         "arrow-body-style": "off",
         "react/function-component-definition": "off",
         "import/prefer-default-export": "off",
-        "@typescript-eslint/no-unused-vars": ["warn"],
+        "@typescript-eslint/no-unused-vars": "warn",
         "react/react-in-jsx-scope": "off",
         "@typescript-eslint/no-explicit-any": "off",
         "global-require": "off",

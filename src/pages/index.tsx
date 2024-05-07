@@ -6,7 +6,7 @@ import { BlogIntro } from '@/components/BlogIntro';
 import { CategoryList } from '@/components/CategoryList';
 import { readSiteData } from '@/services/data.service';
 
-type IndexPageProps = {} & SiteData;
+type IndexPageProps = object & SiteData;
 
 export default function Page(props: InferGetStaticPropsType<typeof getStaticProps>) {
     const { topics, entities, keywords, categories, intro } = props;
@@ -26,7 +26,7 @@ export default function Page(props: InferGetStaticPropsType<typeof getStaticProp
             <section>
                 <CategoryList
                     categories={categories}
-                    onOpen={(index) => setIsCatListOpen(true)}
+                    onOpen={() => setIsCatListOpen(true)}
                     onClosed={() => setIsCatListOpen(false)}
                 />
             </section>
@@ -34,7 +34,7 @@ export default function Page(props: InferGetStaticPropsType<typeof getStaticProp
     );
 }
 
-export const getStaticProps = (async (context) => {
+export const getStaticProps = (async () => {
     const siteData = await readSiteData();
     return {
         props: {

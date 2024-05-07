@@ -1,59 +1,51 @@
-import {SiteConfigs} from "@/types/data.types";
 import {
     Modal,
     ModalContent,
     ModalHeader,
     ModalBody,
-    ModalFooter, useDisclosure
-} from "@nextui-org/react";
-import React from "react";
-import {Button} from "@nextui-org/button";
-import {useSiteData} from "@/context/context.site-data";
+    ModalFooter,
+    useDisclosure
+} from '@nextui-org/react';
+import React from 'react';
+import { Button } from '@nextui-org/button';
+import { useSiteData } from '@/context/context.site-data';
 
 type Props = {
-    open?: boolean
-    onChange?: (isOpen: boolean) => void
-}
+    open?: boolean;
+    onChange?: (isOpen: boolean) => void;
+};
 
 export const Menu = (props: Props) => {
-    const {open, onChange} = props;
-    const {siteData, siteConfig} = useSiteData();
+    const { open, onChange } = props;
+    const { siteConfig } = useSiteData();
 
-    const {isOpen, onOpen, onOpenChange} = useDisclosure({
+    const { isOpen, onOpenChange } = useDisclosure({
         isOpen: open
     });
 
     const handleChange = (_isOpen: boolean) => {
         onChange!(_isOpen);
         onOpenChange();
-    }
+    };
 
     return (
-        <Modal isOpen={isOpen}
-               onOpenChange={handleChange}
-               size={"3xl"}
-               backdrop={"blur"}
-        >
-            <ModalContent className={"bg-gray-100"}>
-                {
-                    (onClose) => (
-                        <>
-                            <ModalHeader>{siteConfig?.title}</ModalHeader>
-                            <ModalBody>
-                                body
-                            </ModalBody>
-                            <ModalFooter>
-                                <Button color="danger" variant="light" onPress={onClose}>
-                                    Close
-                                </Button>
-                                <Button color="primary" onPress={onClose}>
-                                    Action
-                                </Button>
-                            </ModalFooter>
-                        </>
-                    )
-                }
+        <Modal isOpen={isOpen} onOpenChange={handleChange} size={'3xl'} backdrop={'blur'}>
+            <ModalContent className={'bg-gray-100'}>
+                {(onClose) => (
+                    <>
+                        <ModalHeader>{siteConfig?.title}</ModalHeader>
+                        <ModalBody>body</ModalBody>
+                        <ModalFooter>
+                            <Button color='danger' variant='light' onPress={onClose}>
+                                Close
+                            </Button>
+                            <Button color='primary' onPress={onClose}>
+                                Action
+                            </Button>
+                        </ModalFooter>
+                    </>
+                )}
             </ModalContent>
         </Modal>
-    )
-}
+    );
+};

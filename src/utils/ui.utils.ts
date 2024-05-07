@@ -1,11 +1,4 @@
-import React, {
-    ReactChildren,
-    ReactNode,
-    RefObject,
-    useEffect,
-    useLayoutEffect,
-    useState
-} from 'react';
+import React, { ReactNode, RefObject, useEffect, useLayoutEffect, useState } from 'react';
 import { AutoFields } from '@/types/data.types';
 import { KeywordColor } from '@/types/ui.types';
 
@@ -41,7 +34,7 @@ export const useHover = <T extends HTMLElement>(): [React.RefObject<T>, boolean]
     return [ref, value];
 };
 
-export const useTimer = (time: number, callback?: () => {}): boolean => {
+export const useTimer = (time: number, callback?: () => object): boolean => {
     const [isTimeUp, setIsTimeUp] = useState<boolean>(false);
     React.useEffect(() => {
         const timeout = setTimeout(() => {
@@ -56,7 +49,7 @@ export const useTimer = (time: number, callback?: () => {}): boolean => {
 export const useIsomorphicLayoutEffect =
     typeof window !== 'undefined' ? useLayoutEffect : useEffect;
 
-export const windowScrollY = () => {
+export const useWindowScrollY = () => {
     const [scrollY, setScrollY] = useState<number>(0);
     const handleScroll = () => setScrollY(window.scrollY);
     useIsomorphicLayoutEffect(() => {

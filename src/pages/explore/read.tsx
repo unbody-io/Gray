@@ -17,7 +17,7 @@ import Link from 'next/link';
 import { ParagraphSkeleton } from '@/components/skeletons';
 import { CircularProgress } from '@nextui-org/progress';
 
-type ReadPageProps = {} & SiteData;
+type ReadPageProps = object & SiteData;
 
 const findMostSimilarBlock = (input: string, blocks: TextBlock[]): TextBlock => {
     return blocks.reduce(
@@ -99,7 +99,7 @@ type PageProps = {
     loading?: boolean;
 };
 
-const Page = ({ data, loading = true }: PageProps) => {
+const Page = ({ data }: PageProps) => {
     return (
         <div className={'w-full'}>
             {data.result
@@ -252,7 +252,7 @@ export default function ReadPage(props: InferGetStaticPropsType<typeof getStatic
     );
 }
 
-export const getStaticProps = (async (context) => {
+export const getStaticProps = (async () => {
     const siteData = await readSiteData();
     return {
         props: {

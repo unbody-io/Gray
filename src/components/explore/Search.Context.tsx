@@ -11,8 +11,7 @@ type SearchContextProps = {
 
 export const SearchContextPanel = (props: SearchContextProps) => {
     const {
-        onAnimationDone = () => {},
-        payload: { data, isLoading, error }
+        payload: { data, isLoading }
     } = props;
 
     return (

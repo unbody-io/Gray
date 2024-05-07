@@ -13,7 +13,6 @@ type Props = {
 
 export const CardStack = (props: Props) => {
     const {
-        onOpen,
         openIndex = -1,
         index,
         children,

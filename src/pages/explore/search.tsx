@@ -19,7 +19,6 @@ import { buildQueryUrl } from '@/utils/query.utils';
 export default function ExplorePage() {
     const { query: queryParams } = useRouter();
     const [showQaLabel, setShowQaLabel] = React.useState(false);
-    const [showRelatedObjects, setShowRelatedObjects] = React.useState(false);
 
     const [refactoredQueryForArticles, setRefactoredQueryForArticle] = useState(
         queryParams.query
@@ -84,9 +83,7 @@ export default function ExplorePage() {
                         payload={context}
                         onAnimationDone={() => {
                             setShowQaLabel(true);
-                            setTimeout(() => {
-                                setShowRelatedObjects(true);
-                            }, 1000);
+                            setTimeout(() => {}, 1000);
                         }}
                     />
                 }

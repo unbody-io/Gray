@@ -142,7 +142,7 @@ const searchAboutOnTextBlocks = async <T>(
     minScore = 0.6
 ): Promise<T[]> => {
     const query = unbody.get.textBlock
-        .where(({ NotEqual, And, ContainsAny }) => {
+        .where(({ NotEqual, And }) => {
             return And(
                 { tagName: NotEqual('h1') },
                 { tagName: NotEqual('h2') },
@@ -257,8 +257,7 @@ const askOnTextBlocks = async <T>(
         'html',
         'document',
         'document'
-    ],
-    minScore = 0.7
+    ]
 ): Promise<T | null> => {
     const query = await unbody.get.textBlock
         .select(...select)

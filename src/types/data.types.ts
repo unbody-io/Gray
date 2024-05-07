@@ -4,7 +4,6 @@ import {
     IImageBlock,
     ITextBlock
 } from '@unbody-io/ts-client/build/core/documents';
-import { id } from 'postcss-selector-parser';
 import { TextBlock } from '@unbody-io/ts-client/build/types/TextBlock.types';
 
 export type NameEntity = {

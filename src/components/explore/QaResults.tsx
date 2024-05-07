@@ -70,15 +70,15 @@ export const QaResults = (props: QaResultsProps) => {
                                             'text-md font-medium leading-relaxed indent-6'
                                         }
                                     >
-                                        "...{qaAnswer}"
+                                        {`"...${qaAnswer}"`}
                                     </p>
                                 </blockquote>
                             </div>
                         ) : (
                             <div>
                                 <span>
-                                    It seems that there's not any exact answer match for
-                                    your question. Probably you can try the
+                                    {`It seems that there's not any exact answer match for
+                                    your question. Probably you can try the`}
                                 </span>
                                 <Link
                                     className={

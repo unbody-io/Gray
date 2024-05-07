@@ -1,4 +1,4 @@
-import { PromptConfig, PromptInput } from '@/types/prompt.types';
+import { PromptInput } from '@/types/prompt.types';
 
 export const renderPrompt = (prompt: PromptInput): string => {
     return [

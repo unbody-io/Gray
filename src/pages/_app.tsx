@@ -17,8 +17,7 @@ export default function App({ Component, pageProps }: AppProps) {
             <NextThemesProvider defaultTheme={'light'} attribute={'class'}>
                 <SWRConfig
                     value={{
-                        fetcher: (url: string, ...rest) =>
-                            fetch(url).then((res) => res.json())
+                        fetcher: (url: string) => fetch(url).then((res) => res.json())
                     }}
                 >
                     <SiteDataProvider>
