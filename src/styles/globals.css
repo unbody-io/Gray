@@ -13,8 +13,6 @@
     transition: all 250ms;
 }
 
-.active .chip {
-}
 .active .chip-content {
     @apply scale-80 px-[1px] py-0;
 }
