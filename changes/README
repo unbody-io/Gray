@@ -1,0 +1,53 @@
+### ESLint Configuration
+
+I've created an ESLint configuration file to enforce code quality and best practices in our project. Here's a summary of the key settings:
+
+-   **Parser**: @typescript-eslint/parser
+-   **Extends**: @typescript-eslint/recommended, react/recommended, prettier, next/core-web-vitals
+-   **Plugins**: react, react-hooks, @typescript-eslint, prettier
+-   **Environment**: browser, node, es6
+
+#### Rules
+
+-   Core Web Vitals & Code Quality Improvements
+
+    -   `react/jsx-filename-extension`: Warns when JSX files have incorrect extensions.
+    -   `import/extensions`: Enforces consistent use of file extensions in imports.
+    -   `@typescript-eslint/no-unused-vars`: Warns about unused variables.
+    -   `react/react-in-jsx-scope`: Ensures React is in scope for JSX.
+
+-   React Specific Rules
+
+    -   `react/button-has-type`: Enforces buttons to have a type attribute.
+    -   `react/require-default-props`: Requires default props for React components.
+
+-   Accessibility
+
+    -   Several rules to improve accessibility of the code.
+
+-   Other Code Quality Improvements
+
+    -   Several rules to improve code quality and maintainability.
+
+-   Turned off rules
+    -   Rules that are turned off or not applicable to our project.
+
+### Prettier Configuration
+
+I've also set up a Prettier configuration for consistent code formatting. Here are the key settings:
+
+-   **printWidth**: 90
+-   **tabWidth**: 4
+-   **useTabs**: false
+-   **semi**: true
+-   **singleQuote**: true
+-   **jsxSingleQuote**: true
+-   **trailingComma**: none
+-   **bracketSpacing**: true
+-   **arrowParens**: always
+
+### Pre-commit Hook (Husky)
+
+I've added a pre-commit hook using Husky to run Prettier and ESLint checks before each commit. This ensures that our code meets the defined standards. The pre-commit script also includes emoji for a more visually appealing output.
+
+Let me know if you need further details or adjustments to these configurations!
