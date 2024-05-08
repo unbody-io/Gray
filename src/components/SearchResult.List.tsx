@@ -52,10 +52,10 @@ const List = ({
                         {loading
                             ? loadingLabel
                             : error
-                            ? 'Error loading data'
-                            : maxSize > 0
-                            ? `${maxSize} ${label}`
-                            : noResultsLabel}
+                              ? 'Error loading data'
+                              : maxSize > 0
+                                ? `${maxSize} ${label}`
+                                : noResultsLabel}
                     </span>
                 </div>
             }

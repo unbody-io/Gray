@@ -49,9 +49,12 @@ const useCatHeadAnimations = (
             setTimeout(() => {
                 setState((prev) => ({ ...prev, showText: true }));
             }, delay);
-            setTimeout(() => {
-                setState((prev) => ({ ...prev, showStatus: true }));
-            }, 500 * (index + 1) + delay);
+            setTimeout(
+                () => {
+                    setState((prev) => ({ ...prev, showStatus: true }));
+                },
+                500 * (index + 1) + delay
+            );
         }
     }, [index]);
 
