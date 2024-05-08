@@ -1,7 +1,6 @@
-import {AutoFields} from "@/types/data.types";
-import React, {useMemo} from "react";
-import {highlightTags} from "@/components/TextWithHighlights";
-import {TagProps, ESearchMode} from "@/types/ui.types";
+import React, { useMemo } from 'react';
+import { highlightTags } from '@/components/TextWithHighlights';
+import { TagProps } from '@/types/ui.types';
 
 type IProps = {
     text: string;
@@ -10,29 +9,36 @@ type IProps = {
 };
 
 export const InteractiveParagraph = (props: IProps) => {
-    const {text, tags, alwaysActive = false} = props;
+    const { text, tags, alwaysActive = false } = props;
     const [active, setActive] = React.useState<boolean>(true);
 
-    const handleMouseEnter = (e: React.MouseEvent<HTMLSpanElement>) => {
+    const handleMouseEnter = () => {
         setActive(true);
-    }
+    };
 
-    const handleMouseLeave = (e: React.MouseEvent<HTMLSpanElement>) => {
-        if (!alwaysActive){
+    const handleMouseLeave = () => {
+        if (!alwaysActive) {
             setActive(false);
         }
-    }
+    };
 
     const h = useMemo(() => {
-        return highlightTags({tags, text, active: active})
+        return highlightTags({ tags, text, active: active });
     }, [text, tags]);
 
     return (
-        <div dangerouslySetInnerHTML={{__html: h}}
-             onMouseEnter={handleMouseEnter}
-             onMouseLeave={handleMouseLeave}
-             className={active ? "active" : ""}
+        <div
+            role='button'
+            tabIndex={0}
+            aria-label='Button label'
+            dangerouslySetInnerHTML={{ __html: h }}
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}
+            className={active ? 'active' : ''}
         />
-    )
-}
+    );
+};
 
+InteractiveParagraph.defaultProps = {
+    alwaysActive: true
+};

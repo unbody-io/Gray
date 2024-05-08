@@ -1,0 +1,39 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+# Emoji helpers
+info() {
+  echo "✨ $1"
+}
+
+success() {
+  echo "✅ $1"
+}
+
+error() {
+  echo "❌ $1"
+}
+
+# Run Prettier
+info "Running Prettier..."
+npx prettier --check .
+if [ $? -ne 0 ]; then
+  error "Prettier check failed, please fix the issues."
+  exit 1
+else
+  success "Prettier check passed."
+fi
+
+# Run ESLint
+info "Running ESLint..."
+yarn lint
+if [ $? -ne 0 ]; then
+  error "ESLint check failed, please fix the issues."
+  exit 1
+else
+  success "ESLint check passed."
+fi
+
+# Add more tools as needed
+
+success "All checks passed. Ready to commit!"

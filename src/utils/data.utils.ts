@@ -1,4 +1,4 @@
-import {ESearchMode} from "@/types/ui.types";
+import { ESearchMode } from '@/types/ui.types';
 
 export const uniqueBy = <T, K extends keyof T>(arr: T[], key: K) => {
     const seen = new Set<T[K]>();
@@ -9,17 +9,15 @@ export const uniqueBy = <T, K extends keyof T>(arr: T[], key: K) => {
         seen.add(item[key]);
         return true;
     });
-}
+};
 
 // a function that compares two arrays and return overlapping elements
 export const findSimilar = (arr1: string[], arr2: string[]) => {
-    return arr1.filter(value => arr2.includes(value));
-}
+    return arr1.filter((value) => arr2.includes(value));
+};
 
-
-export const transformTag = (key: string, type:string, searchMode: ESearchMode) => ({
+export const transformTag = (key: string, type: string, searchMode: ESearchMode) => ({
     key: key.toLowerCase(),
     type,
     link: `/explore/${searchMode}?${type}=${key.toLowerCase()}`
-})
-
+});
