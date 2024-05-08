@@ -1,3 +1,4 @@
+import React from 'react';
 import { SiteConfigs, SiteData } from '@/types/data.types';
 import { createContext, ReactNode, useContext } from 'react';
 

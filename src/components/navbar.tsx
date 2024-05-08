@@ -60,3 +60,7 @@ export const Navbar = (props: NavbarProps) => {
         </>
     );
 };
+
+Navbar.defaultProps = {
+    searchBoxProps: undefined
+};

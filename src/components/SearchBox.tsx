@@ -78,6 +78,11 @@ const SearchInput = ({
     );
 };
 
+SearchInput.defaultProps = {
+    placeHolder: undefined,
+    label: undefined
+};
+
 export interface SearchBoxProps {
     onModeChange?: (mode: ESearchMode) => void;
     mode?: ESearchMode;
@@ -223,4 +228,9 @@ export const SearchBox = (props: SearchBoxProps) => {
             </div>
         </div>
     );
+};
+
+SearchBox.defaultProps = {
+    onModeChange: undefined,
+    mode: undefined
 };

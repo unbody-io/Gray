@@ -13,7 +13,8 @@ type Props = {
 
 export const TextBlockCardBody = (props: Props) => {
     const { data: block, htmlProps: { className = '', ...rest } = {} } = props;
-    const doc = block.document[0];
+    const { document } = block;
+    const [doc] = document;
 
     return (
         <div
@@ -48,4 +49,8 @@ export const TextBlockCardBody = (props: Props) => {
             </CardFooter>
         </div>
     );
+};
+
+TextBlockCardBody.defaultProps = {
+    htmlProps: undefined
 };

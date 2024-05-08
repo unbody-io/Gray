@@ -28,3 +28,8 @@ export default function DefaultLayout({
         </SearchBarProvider>
     );
 }
+
+DefaultLayout.defaultProps = {
+    searchBoxProps: undefined,
+    containerMaxWidth: undefined
+};

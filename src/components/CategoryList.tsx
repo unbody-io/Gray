@@ -67,3 +67,8 @@ export const CategoryList = ({ categories, onOpen, onClosed }: CategoryListProps
         </>
     );
 };
+
+CategoryList.defaultProps = {
+    onOpen: () => {},
+    onClosed: () => {}
+};

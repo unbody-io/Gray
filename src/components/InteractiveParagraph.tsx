@@ -28,10 +28,17 @@ export const InteractiveParagraph = (props: IProps) => {
 
     return (
         <div
+            role='button'
+            tabIndex={0}
+            aria-label='Button label'
             dangerouslySetInnerHTML={{ __html: h }}
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
             className={active ? 'active' : ''}
         />
     );
+};
+
+InteractiveParagraph.defaultProps = {
+    alwaysActive: true
 };

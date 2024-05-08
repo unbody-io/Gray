@@ -1,3 +1,5 @@
+import React from 'react';
+
 import { GetStaticPaths, GetStaticProps } from 'next';
 import { IGoogleDoc } from '@unbody-io/ts-client/build/core/documents';
 import { unbodyService } from '@/services/unbody.service';

@@ -112,6 +112,10 @@ const Page = ({ data }: PageProps) => {
     );
 };
 
+Page.defaultProps = {
+    loading: false
+};
+
 export default function ReadPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
     const { topics, entities, keywords } = props;
     const { query: queryParams } = useRouter();

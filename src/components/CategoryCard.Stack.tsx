@@ -89,3 +89,8 @@ export const CategoryCardStack = (props: Props) => {
         </CardStack>
     );
 };
+
+CategoryCardStack.defaultProps = {
+    onOpen: () => {},
+    delay: 1000
+};

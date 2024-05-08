@@ -82,7 +82,7 @@ export function useLinePixelWidths(
         if (ref.current) {
             const text = ref.current.innerText.replaceAll('\n', ' ');
             const words = text.split(' ');
-            let tempLinePixelWidths: number[] = [];
+            const tempLinePixelWidths: number[] = [];
             let currentLine = '';
 
             // Create a ghost element for measurements.
@@ -93,7 +93,7 @@ export function useLinePixelWidths(
             ref.current.appendChild(ghostElement);
 
             words.forEach((word, index) => {
-                let potentialLine = currentLine + (currentLine ? ' ' : '') + word;
+                const potentialLine = currentLine + (currentLine ? ' ' : '') + word;
                 ghostElement.innerText = potentialLine;
 
                 // If the potential line fits, update the current line.

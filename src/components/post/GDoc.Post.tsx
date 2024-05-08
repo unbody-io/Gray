@@ -1,3 +1,5 @@
+import React from 'react';
+
 import {
     IGoogleDoc,
     IImageBlock,
@@ -38,7 +40,7 @@ const MyComponent: FC<MyComponentProps> = ({ html, keywords }) => {
         `/explore/search?${keyword.type}=${encodeURIComponent(keyword.value)}`;
 
     // The replace function for html-react-parser
-    let matches: string[] = [];
+    const matches: string[] = [];
     const replaceFn = (domNode: any) => {
         if (domNode.type === 'text') {
             let text = domNode.data;
@@ -102,7 +104,7 @@ const isTitle = (block: ITextBlock | IImageBlock) => {
 
 const isPreviewImage = (block: ITextBlock | IImageBlock) => {
     //@ts-ignore
-    return block.__typename === 'ImageBlock' && block.order === 1;
+    return block['__typename'] === 'ImageBlock' && block.order === 1;
 };
 
 type PreviewImageProps = {
@@ -131,6 +133,10 @@ const PreviewImage = ({ data, height = 500 }: PreviewImageProps) => {
             />
         </div>
     );
+};
+
+PreviewImage.defaultProps = {
+    height: 500
 };
 
 export const GDocPost = ({ data }: Props) => {
@@ -192,7 +198,7 @@ export const GDocPost = ({ data }: Props) => {
                         .filter((b) => !isPreviewImage(b) && !isTitle(b))
                         // @ts-ignore
                         .map((block, index) => {
-                            if (block.__typename === 'TextBlock') {
+                            if (block['__typename'] === 'TextBlock') {
                                 return (
                                     <UnbodyTextBlock
                                         data={block as ITextBlock}
@@ -201,7 +207,7 @@ export const GDocPost = ({ data }: Props) => {
                                     />
                                 );
                             }
-                            if (block.__typename === 'ImageBlock') {
+                            if (block['__typename'] === 'ImageBlock') {
                                 return (
                                     <UnbodyImage data={block as ImageBlock} key={index} />
                                 );

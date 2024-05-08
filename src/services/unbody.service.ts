@@ -268,7 +268,7 @@ const askOnTextBlocks = async <T>(
         data: { payload }
     } = await query.exec();
     const topAnswer =
-        payload[0]._additional.answer && payload[0]._additional.answer.hasAnswer
+        payload[0]['_additional'].answer && payload[0]['_additional'].answer.hasAnswer
             ? payload[0]
             : null;
 

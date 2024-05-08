@@ -109,7 +109,7 @@ export const SearchBarProvider = ({ children }: { children: React.ReactNode }) =
             .split(',')
             .filter((v) => v !== value)
             .join(',');
-        let newQuery = { ...router.query };
+        const newQuery = { ...router.query };
 
         if (newValue.trim().length > 0) {
             newQuery[type] = newValue;

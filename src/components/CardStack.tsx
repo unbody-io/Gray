@@ -4,11 +4,11 @@ import clsx from 'clsx';
 type Props = {
     onOpen?: () => void;
     openIndex?: number;
-    index: number;
-    children: React.ReactNode;
+    gap?: number;
     height?: number;
     maxStackSize?: number;
-    gap?: number;
+    index: number;
+    children: React.ReactNode;
 };
 
 export const CardStack = (props: Props) => {
@@ -59,6 +59,7 @@ export const CardStack = (props: Props) => {
 
     return (
         <div
+            role='link'
             className={clsx([
                 'transition-all ease-in-out duration-700',
                 `${isOpen ? 'drop-shadow-2xl py-6 px-4' : 'drop-shadow-lg'}`,
@@ -101,4 +102,12 @@ export const CardStack = (props: Props) => {
             </div>
         </div>
     );
+};
+
+CardStack.defaultProps = {
+    onOpen: () => {},
+    openIndex: -1,
+    gap: 30,
+    height: 100,
+    maxStackSize: 3
 };

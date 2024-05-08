@@ -8,12 +8,11 @@ import { articleCardBaseClasses } from '@/components/ArticleCard';
 import { LineSkeleton } from '@/components/skeletons';
 import { LoadingIcon } from '@/components/icons';
 
-type HeadCardProps = {
+type CategoryHeadCardProps = {
     data: Category;
     blur?: boolean;
     open: boolean;
     onClick?: () => void;
-
     index: number;
     delay: number;
 };
@@ -63,7 +62,7 @@ const NumbersSkeleton = () => (
     <LoadingIcon className={'animate-spin h-2 w-2 text-current'} />
 );
 
-export const CategoryHeadCard = (props: HeadCardProps) => {
+export const CategoryHeadCard = (props: CategoryHeadCardProps) => {
     const {
         data: { title, summary, articles, blocks },
         onClick,
@@ -122,4 +121,9 @@ export const CategoryHeadCard = (props: HeadCardProps) => {
             </CardFooter>
         </Card>
     );
+};
+
+CategoryHeadCard.defaultProps = {
+    blur: false,
+    onClick: undefined
 };

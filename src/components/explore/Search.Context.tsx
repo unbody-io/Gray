@@ -28,3 +28,7 @@ export const SearchContextPanel = (props: SearchContextProps) => {
         </div>
     );
 };
+
+SearchContextPanel.defaultProps = {
+    onAnimationDone: () => {}
+};

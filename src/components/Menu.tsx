@@ -49,3 +49,10 @@ export const Menu = (props: Props) => {
         </Modal>
     );
 };
+
+Menu.defaultProps = {
+    open: false,
+    onChange: function () {
+        this.open = !this.open;
+    }
+};

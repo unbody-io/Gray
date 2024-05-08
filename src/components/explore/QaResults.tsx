@@ -21,10 +21,10 @@ export const QaResults = (props: QaResultsProps) => {
     const qaAnswer =
         !isLoading &&
         data &&
-        data._additional.answer &&
-        data._additional.answer.hasAnswer &&
-        data._additional.certainty >= 0.7
-            ? data!._additional.answer.result
+        data['_additional'].answer &&
+        data['_additional'].answer.hasAnswer &&
+        data['_additional'].certainty >= 0.7
+            ? data!['_additional'].answer.result
             : null;
 
     return (

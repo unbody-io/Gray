@@ -8,14 +8,14 @@ import { BlockCard } from '@/components/BlockCard';
 import { TextBlockCardBody } from '@/components/TextBlockCard.Body';
 import { LoadingIcon } from '@/components/icons';
 
-type CategoryListProps = {
+type SearchResultsListProps = {
     onOpen?: (index: number) => void;
     onClosed?: () => void;
     articles: SWRResponse<MiniArticle[]> | null;
     blocks: SWRResponse<MiniTextBlock[]> | null;
 } & PropsWithChildren<object>;
 
-type ListItemProps = PropsWithChildren<{
+type ListProps = PropsWithChildren<{
     loading: boolean;
     error?: any;
     pageSize: number;
@@ -32,7 +32,7 @@ const List = ({
     itemName,
     wrapperClassName,
     listClassName
-}: ListItemProps) => {
+}: ListProps) => {
     const [page, setPage] = React.useState(1);
     const maxSize = React.Children.count(children);
 
@@ -78,7 +78,13 @@ const List = ({
     );
 };
 
-export const SearchResultsList = ({ articles, blocks }: CategoryListProps) => {
+List.defaultProps = {
+    error: undefined,
+    wrapperClassName: '',
+    listClassName: ''
+};
+
+export const SearchResultsList = ({ articles, blocks }: SearchResultsListProps) => {
     return (
         <div>
             {articles && (
@@ -120,4 +126,9 @@ export const SearchResultsList = ({ articles, blocks }: CategoryListProps) => {
             )}
         </div>
     );
+};
+
+SearchResultsList.defaultProps = {
+    onOpen: undefined,
+    onClosed: undefined
 };

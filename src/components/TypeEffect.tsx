@@ -2,14 +2,19 @@ import React, { HTMLProps } from 'react';
 import Typewriter from 'typewriter-effect';
 import { renderToString } from 'react-dom/server';
 
-type Props = {
+type TypeEffectProps = {
     delay?: number;
     children: React.ReactElement | string;
     cursor?: string;
     onEnd?: () => void;
 } & HTMLProps<HTMLDivElement>;
 
-export const TypeEffect = ({ children, cursor, delay = 10, onEnd = () => {} }: Props) => {
+export const TypeEffect = ({
+    children,
+    cursor,
+    delay = 10,
+    onEnd = () => {}
+}: TypeEffectProps) => {
     return (
         children && (
             <Typewriter
@@ -34,4 +39,10 @@ export const TypeEffect = ({ children, cursor, delay = 10, onEnd = () => {} }: P
             />
         )
     );
+};
+
+TypeEffect.defaultProps = {
+    delay: 10,
+    cursor: undefined,
+    onEnd: undefined
 };

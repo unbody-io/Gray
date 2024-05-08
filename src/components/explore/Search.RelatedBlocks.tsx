@@ -43,3 +43,7 @@ export const BlockList = (props: ArticleListProps) => {
         </div>
     );
 };
+
+BlockList.defaultProps = {
+    pageSize: 3
+};
