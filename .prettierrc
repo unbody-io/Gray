@@ -7,10 +7,5 @@
     "jsxSingleQuote": true,
     "trailingComma": "none",
     "bracketSpacing": true,
-    "arrowParens": "always",
-    "requireConfig": false,
-    "editor.formatOnSave": true,
-    "html.format.wrapLineLength": 80,
-    "html.format.wrapAttributes": "force-expand-multiline",
-    "importOrderSortSpecifiers": true
+    "arrowParens": "always"
 }
