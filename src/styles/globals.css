@@ -2,9 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-
-
-
 .chip{
     @apply rounded-full capitalize text-center relative max-w-fit min-w-min inline-flex items-center justify-between box-border whitespace-nowrap bg-transparent py-0;
     transition: all 250ms;

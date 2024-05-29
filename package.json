@@ -6,9 +6,11 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "build-sitedata": "node -r ts-node/register -r dotenv/config -r tsconfig-paths/register src/prebuild-data/generator.ts"
   },
   "dependencies": {
+    "@next/env": "^14.2.3",
     "@nextui-org/react": "^2.2.6",
     "@nextui-org/theme": "^2.1.18",
     "@tailwindcss/typography": "^0.5.10",
@@ -18,7 +20,7 @@
     "@types/react": "^18.2.60",
     "@types/react-dom": "18.2.7",
     "@uidotdev/usehooks": "^2.4.1",
-    "@unbody-io/ts-client": "^0.0.8",
+    "@unbody-io/ts-client": "^0.0.15",
     "autoprefixer": "10.4.15",
     "clsx": "^2.0.0",
     "framer-motion": "^10.16.4",

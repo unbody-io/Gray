@@ -26,7 +26,6 @@ export default function ExplorePage() {
     const relatedArticles = useSWR<MiniArticle[]>(buildQueryUrl(`/api/search/articles`, { ...queryParams, query: refactoredQueryForArticles|| queryParams.query }, ['query', 'entities', 'topics', 'keywords']));
     const relatedBlocks = useSWR<MiniTextBlock[]>(buildQueryUrl(`/api/search/blocks`, {...queryParams, query: refactoredQueryForBlocks|| queryParams.query}, ['query', 'entities', 'topics', 'keywords']));
 
-
     useEffect(() => {
         // When context data is available, check for conditions to update articleQuery
         if(context.data && context.data.concepts) {
@@ -44,6 +43,9 @@ export default function ExplorePage() {
         }
     }, [context.data, relatedArticles.data, relatedArticles.isLoading]);
 
+
+    console.log(ask.data, showQaLabel)
+
     return (
         <DefaultLayout>
             <div className={"min-h-[100px]"}>
@@ -59,7 +61,7 @@ export default function ExplorePage() {
                 }
                 <Spacer y={4}/>
                 {
-                    (showQaLabel && context.data && context.data.isQuestion) &&
+                    (context.data && context.data.isQuestion) &&
                     <QaResults payload={ask}/>
                 }
             </div>

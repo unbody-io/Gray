@@ -18,8 +18,6 @@ export default async function handler(
         return Array.isArray(key) ? key : key.split(",");
     }
 
-    console.log("/api/search/articles", q, req.query.entities, req.query.topics, req.query.keywords)
-
     res.status(200).json(
         await unbodyService.searchAboutOnGoogleDocs(
             q,

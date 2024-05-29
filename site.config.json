@@ -1,4 +1,17 @@
 {
-  "title": "Welcome to my blog",
-  "description": "This is my first blog post"
+  "siteData": {
+    "title": "My Site"
+  },
+  "socials": [
+    {
+      "label": "Twitter",
+      "link": "https://twitter.com",
+      "provider": "x"
+    },
+    {
+      "label": "Facebook",
+      "link": "https://facebook.com",
+      "provider": "facebook"
+    }
+  ]
 }

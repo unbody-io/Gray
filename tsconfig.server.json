@@ -1,4 +1,4 @@
-{
+  {
   "compilerOptions": {
     "lib": ["esnext"],
     "allowJs": true,

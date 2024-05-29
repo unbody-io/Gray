@@ -1,21 +1,22 @@
 import {Unbody} from "@unbody-io/ts-client";
-import {introPrompt} from "@/utils/prompt-templates/prompt.template.intro";
 import {categoriesPrompt} from "@/utils/prompt-templates/prompt.template.categories";
-import {testEntities, testTopics} from "@/utils/test-data";
 import {
-    AutoFields, AutoFieldsRaw,
-    CategoryRaw,
-    NameEntity,
+    AutoFields,
+    AutoFieldsRaw, Category,
+    CategoryRaw, ImageBlock, MiniArticle, MiniTextBlock,
     QueryContextItem,
     ReadPageData,
     ReadPageResponse,
     SearchContextResponse,
-    Topic
+    SiteContext,
+    SiteContextConfig,
+    SiteType
 } from "@/types/data.types";
 import {searchContextPrompt} from "@/utils/prompt-templates/prompt.template.topic";
-import {IGoogleDoc} from "@unbody-io/ts-client/build/core/documents";
-import {TextBlock} from "@unbody-io/ts-client/build/types/TextBlock.types";
+import {IGoogleDoc, IVideoFile} from "@unbody-io/ts-client/build/core/documents";
 import {readContextPrompt} from "@/utils/prompt-templates/prompt.template.read-blocks";
+import {siteEssentialsPrompt} from "@/utils/prompt-templates/prompt.template.siteEssentials";
+import {siteSummaryPrompt} from "@/utils/prompt-templates/prompt.template.intro";
 
 if (!process.env.UNBODY_API_KEY || !process.env.UNBODY_PROJECT_ID) {
     throw new Error("UNBODY_API_KEY and UNBODY_PROJECT_ID must be set");
@@ -27,74 +28,254 @@ export const unbody = new Unbody({
 })
 
 export const getAutoFields = async (): Promise<AutoFields> => {
-    const {data: {payload}} = await unbody.get
-        .googleDoc
-        .select("autoKeywords", "autoEntities", "autoTopics")
-        .group(0.1, "closest")
-        .exec()
+    const [googleDocsResponse, videoFilesResponse, imageBlocksResponse] = await Promise.all([
+        unbody.get.googleDoc
+            .select("autoKeywords", "autoEntities", "autoTopics")
+            .group(0.1, "closest")
+            .exec(),
+        unbody.get.videoFile
+            .select("autoKeywords", "autoEntities", "autoTopics")
+            .group(0.1, "closest")
+            .exec(),
+        unbody.get.imageBlock
+            .select("autoTypes")
+            .group(0.1, "closest")
+            .exec()
+    ]);
 
-    const entities = (payload as AutoFieldsRaw[])
-        .flatMap(({autoEntities}) => autoEntities)
-        .filter((e) => e !== null);
+    // Extract payloads
+    const googleDocs = googleDocsResponse.data.payload;
+    const videoFiles = videoFilesResponse.data.payload;
+    const imageBlocks = imageBlocksResponse.data.payload;
+
+    // Combine all entities
+    const combinedData = [...googleDocs, ...videoFiles, ...imageBlocks] as AutoFieldsRaw[];
+
+    // Extract and filter fields
+    const extractAndFilter = (field: keyof AutoFieldsRaw) =>
+        combinedData.flatMap(item => item[field] ?? []).filter(e => e && e.trim().length > 0);
+
+    const entities = extractAndFilter("autoEntities");
+    const topics = extractAndFilter("autoTopics");
+    const keywords = extractAndFilter("autoKeywords");
+    const types = extractAndFilter("autoTypes");
+
+
     const uniqueEntities = Array.from(new Set(entities));
-
-    // we exclude entities from topics
-    const topics = (payload as AutoFieldsRaw[])
-        .flatMap(({autoTopics}) => autoTopics)
-        .filter((t) => t && !uniqueEntities.includes(t));
     const uniqueTopics = Array.from(new Set(topics));
-
-    // excluding both entities and topics from keywords
-    const keywords = (payload as AutoFieldsRaw[])
-        .flatMap(({autoKeywords}: { autoKeywords: string[] | null }) => autoKeywords)
-        .filter((k) => k && !uniqueEntities.includes(k) && !uniqueTopics.includes(k));
-
     const uniqueKeywords = Array.from(new Set(keywords));
+    const uniqueTypes = Array.from(new Set(types));
 
     return {
         entities: uniqueEntities as string[],
         topics: uniqueTopics as string[],
-        keywords: uniqueKeywords as string[]
+        keywords: uniqueKeywords as string[],
+        types: uniqueTypes as string[]
     };
 }
 
-const generateBlogIntro = async (entities: string[], topics: string[]): Promise<string> => {
-    const {data: {generate: {result}}} = await unbody
-        .get
-        .googleDoc
-        .select("title")
-        .limit(15)
-        .generate
-        .fromMany(
-            introPrompt.create(entities, topics),
-            ["title", "autoSummary"]
-        )
-        .exec();
 
-    return introPrompt.parse(result);
+const buildSiteContext = async (
+    defaultContext: SiteContextConfig,
+    siteContentSummary: string,
+    availableContentTypes: string[],
+): Promise<SiteContext> => {
+    console.log("Building site context");
+    console.log("1. Getting auto fields");
+    const {topics, entities, keywords, types: imageTypes} = await unbodyService.getAutoFields();
+    console.log(`Got ${topics.length} topics, ${entities.length} entities, ${keywords.length} keywords, ${imageTypes.length} image types`);
+
+    console.log("3. Generating site context");
+    console.log("3.1 Generating site essentials");
+    const essentials: SiteContextConfig = await unbody.get
+        .textBlock
+        .limit(1)
+        .generate
+        .fromOne(
+            siteEssentialsPrompt.create(
+                topics,
+                entities,
+                siteContentSummary,
+                availableContentTypes,
+                defaultContext
+            ),
+        )
+        .exec()
+        .then(({data: {generate}}) => {
+            return siteEssentialsPrompt.parse(generate[0].result) as SiteContextConfig;
+        })
+        .catch((e) => {
+            console.error("Error generating site essentials", e);
+            return {};
+        });
+
+
+    let context: SiteContext = {
+        siteType: essentials.siteType || defaultContext.siteType || SiteType.BLOG,
+        title: essentials.title||defaultContext.title||"Nexlog",
+        autoEntities: entities,
+        autoKeywords: keywords,
+        autoTopics: topics,
+        contributors: essentials.contributors || defaultContext.contributors || [],
+        seoDescription: essentials.seoDescription || defaultContext.seoDescription || "",
+        seoKeywords: essentials.seoKeywords || defaultContext.seoKeywords || [],
+        autoSummary: "",
+        contentSummary: siteContentSummary,
+        availableContentTypes,
+    };
+
+    console.log("3.2 Generating site summary intro");
+    const summary = await unbody.get
+        .textBlock
+        .limit(1)
+        .generate
+        .fromOne(
+            siteSummaryPrompt.create(
+                topics,
+                entities,
+                siteContentSummary,
+                availableContentTypes,
+                context
+            ),
+        )
+        .exec()
+        .then(({data: {generate}}) => generate[0].result)
+        .catch((e) => {
+            console.error("Error generating site summary intro", e);
+            return "";
+        });
+
+    return {
+        ...context,
+        autoSummary: summary,
+    };
+
 }
 
-const generateCategories = async (topics: string[], entities: string[]): Promise<CategoryRaw[]> => {
-    const {data: {generate: {result}}} =
-        await unbody.get
-            .googleDoc
-            .select("title")
-            .limit(15)
+const populateCategories = async (categories: CategoryRaw[], siteContext: SiteContext): Promise<Category[]> => {
+    return Promise.all(categories.map(async (category) => {
+        const relatedArticles = await unbodyService.searchAboutOnGoogleDocs<MiniArticle>(
+            category.title,
+            category.entities,
+            category.topics,
+            [],
+            undefined,
+            0.6
+        );
+
+        const relatedVideos = await unbodyService.searchAboutOnVideoFiles<IVideoFile>(
+            category.title,
+            category.entities,
+            category.topics,
+            [],
+            undefined,
+            0.6
+        );
+
+        const relatedBlocks = await Promise.all([
+            unbodyService.searchAboutOnTextBlocks<MiniTextBlock>(
+                [
+                    category.title,
+                    ...category.topics,
+                    ...category.entities
+                ].join(",")
+            ),
+            unbodyService.searchAboutOnImageBlocks<ImageBlock>(
+                category.title,
+                category.entities,
+                category.topics,
+                [],
+                undefined,
+                0.6
+            )
+        ])
+            .then((results) =>
+                results
+                    .flat()
+                    .sort((a: ImageBlock | MiniTextBlock, b: ImageBlock | MiniTextBlock) =>
+                        b._additional?.certainty - a._additional?.certainty
+                    ))
+
+        return {
+            ...category,
+            articles: relatedArticles,
+            videos: relatedVideos,
+            blocks: relatedBlocks
+        }
+    }));
+}
+
+const generateCategories = async (siteContext: SiteContext): Promise<CategoryRaw[]> => {
+    try {
+        const {data: {generate, errors}} = await unbody.get
+            .textBlock
+            .limit(1)
             .generate
-            .fromMany(
-                categoriesPrompt.create(topics, entities),
-                ["title", "autoSummary"]
+            .fromOne(
+                categoriesPrompt.create(siteContext),
             )
             .exec();
-    return categoriesPrompt.parse(result);
+
+        if (errors){
+            console.log(errors);
+            return []
+        }
+
+        if (generate) {
+            return categoriesPrompt.parse(generate[0].result);
+        } else {
+            console.log("No data received");
+            return [];
+        }
+    } catch (e) {
+        console.error("Error in generating initial categories", e);
+        return [];
+    }
 }
 
-const searchAboutOnGoogleDocs = async <T>(
-    q: string|undefined = "",
+const searchAboutOnVideoFiles = async <T>(
+    q: string | undefined = "",
     entities: string[] = [],
     topics: string[] = [],
     keywords: string[] = [],
-    select: (keyof IGoogleDoc)[] = ["title", "slug", "summary", "modifiedAt", "subtitle"],
+    select: any[] = ["remoteId", "autoSummary", "autoKeywords", "autoTopics", "autoEntities"],
+    minScore = 0.5
+): Promise<T[]> => {
+    let query = unbody.get.videoFile.select(...select);
+
+    const tags = [
+        ...entities.map(e => ({value: e, type: "autoEntities"})),
+        ...topics.map(t => ({value: t, type: "autoTopics"})),
+        ...keywords.map(k => ({value: k, type: "autoKeywords"}))
+    ]
+
+    if (tags.length > 0) {
+        // @ts-ignore
+        query = query.where(({Or, ContainsAny}) => {
+            return Or(
+                ...tags.map(({value, type}) => ({
+                    [type]: ContainsAny(value)
+                }))
+            )
+        })
+    }
+
+    if (q.trim().length > 0) {
+        // @ts-ignore
+        query = query.search.about(q, {certainty: minScore})
+    }
+
+    const {data: {payload}} = await query.exec();
+    return payload as T[];
+}
+
+
+const searchAboutOnGoogleDocs = async <T>(
+    q: string | undefined = "",
+    entities: string[] = [],
+    topics: string[] = [],
+    keywords: string[] = [],
+    select: any = ["title", "slug", "autoSummary", "modifiedAt", "subtitle"],
     minScore = 0.5
 ): Promise<T[]> => {
     let query = unbody.get.googleDoc.select(...select);
@@ -122,13 +303,12 @@ const searchAboutOnGoogleDocs = async <T>(
     }
 
     const {data: {payload}} = await query.exec();
-    return payload
+    return payload as T[];
 }
 
 const searchAboutOnTextBlocks = async <T>(
     q: string | string[],
-    // @ts-ignore
-    select: (keyof Omit<TextBlock, "__typename" | "_additional">)[] = ["order", "html", "document.GoogleDoc.slug"],
+    select: any[] = ["order", "html", "document.GoogleDoc.slug"],
     minScore = 0.6
 ): Promise<T[]> => {
     const query = unbody.get
@@ -146,7 +326,39 @@ const searchAboutOnTextBlocks = async <T>(
         .about(q, {certainty: minScore});
 
     const {data: {payload}} = await query.exec();
-    return payload;
+    return payload as T[];
+}
+
+
+const searchAboutOnImageBlocks = async <T>(
+    q: string | undefined = "",
+    entities: string[] = [],
+    topics: string[] = [],
+    keywords: string[] = [],
+    select: any[] = ["order", "html", "document.GoogleDoc.slug"],
+    minScore = 0.5
+): Promise<T[]> => {
+    let query = unbody.get.imageBlock.select(...select);
+
+    const tags = [
+        ...entities.map(e => ({value: e, type: "autoEntities"})),
+        ...topics.map(t => ({value: t, type: "autoTopics"})),
+        ...keywords.map(k => ({value: k, type: "autoKeywords"}))
+    ]
+
+    if (tags.length > 0) {
+        // @ts-ignore
+        query = query.where(({Or, ContainsAny}) => {
+            return Or(
+                ...tags.map(({value, type}) => ({
+                    [type]: ContainsAny(value)
+                }))
+            )
+        })
+    }
+
+    const {data: {payload}} = await query.exec();
+    return payload as T[];
 }
 
 const generateSearchContext = async (contextItems: QueryContextItem[] = [], q?: string): Promise<SearchContextResponse> => {
@@ -196,14 +408,14 @@ const generateReadPage = async (contextItems: QueryContextItem[] = [], prevPages
             )
         })
 
-    if(!emptyQuery) {
+    if (!emptyQuery) {
         // @ts-ignore
         query = query.search[searchMethod](searchQuery)
     }
 
 
     const lastPage = prevPages.length > 0 ? prevPages[prevPages.length - 1] : null;
-    const lastBlock = lastPage? lastPage.from[lastPage.from.length - 1] : null;
+    const lastBlock = lastPage ? lastPage.from[lastPage.from.length - 1] : null;
 
     const {data: {generate}} = await query
         .limit(3)
@@ -213,11 +425,11 @@ const generateReadPage = async (contextItems: QueryContextItem[] = [], prevPages
             ["text"]
         )
         .exec();
-    return generate;
+    return generate as any;
 }
 
 
-const askOnGoogleDocs = async (question: string): Promise<string> => {
+const askOnGoogleDocs = async (question: string): Promise<any> => {
     const query = await unbody.get
         .googleDoc
         .ask(question);
@@ -228,8 +440,7 @@ const askOnGoogleDocs = async (question: string): Promise<string> => {
 
 const askOnTextBlocks = async <T>(
     question: string,
-    // @ts-ignore
-    select: (keyof Omit<TextBlock, "__typename" | "_additional">)[] = ["order", "html", "document.GoogleDoc.slug", "document.GoogleDoc.title"],
+    select: any[] = ["order", "html", "document.GoogleDoc.slug", "document.GoogleDoc.title"],
     minScore = 0.7
 ): Promise<T | null> => {
     const query = await unbody.get
@@ -239,12 +450,13 @@ const askOnTextBlocks = async <T>(
         .ask(question);
 
     const {data: {payload}} = await query.exec();
-    const topAnswer = (
+    if (payload.length === 0) return null;
+    if (!payload[0]._additional) return null;
+
+    return (
         payload[0]._additional.answer
         && payload[0]._additional.answer.hasAnswer
-    ) ? payload[0] : null;
-
-    return topAnswer || null;
+    ) ? payload[0] as T : null;
 }
 
 const getPost = async (slug: string): Promise<IGoogleDoc | null> => {
@@ -261,8 +473,8 @@ const getPost = async (slug: string): Promise<IGoogleDoc | null> => {
             "slug",
             "subtitle",
             "toc",
+            // @ts-ignore
             "modifiedAt",
-            //@ts-ignore
             "blocks.TextBlock.order",
             "blocks.TextBlock.html",
             "blocks.TextBlock.text",
@@ -279,7 +491,7 @@ const getPost = async (slug: string): Promise<IGoogleDoc | null> => {
             "mentions"
         )
     const {data: {payload}} = await query.exec();
-    return payload[0] || null;
+    return payload[0] as IGoogleDoc || null;
 }
 
 const getPostSlugs = async (): Promise<string[]> => {
@@ -290,15 +502,18 @@ const getPostSlugs = async (): Promise<string[]> => {
 
 
 export const unbodyService = {
-    generateBlogIntro,
     generateCategories,
     searchAboutOnGoogleDocs,
+    searchAboutOnVideoFiles,
     searchAboutOnTextBlocks,
+    searchAboutOnImageBlocks,
     generateSearchContext,
     askOnGoogleDocs,
     askOnTextBlocks,
     getPost,
     getPostSlugs,
     getAutoFields,
-    generateReadPage
+    generateReadPage,
+    buildSiteContext,
+    populateCategories
 }

@@ -22,7 +22,9 @@ export const SearchContextPanel = (props: SearchContextProps) => {
     return (
         <div className={"text-default-600 min-h-[130px]"}>
             {
-                <TextReveal withDefaultSkeleton={true}>
+                <TextReveal withDefaultSkeleton={true}
+                            onTransitionEnd={onAnimationDone}
+                >
                     <InteractiveParagraph text={data&&!isLoading? data.introduction : ""}
                                           tags={[]}
                                           alwaysActive={true}

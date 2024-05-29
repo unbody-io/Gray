@@ -23,3 +23,9 @@ export const transformTag = (key: string, type:string, searchMode: ESearchMode) 
     link: `/explore/${searchMode}?${type}=${key.toLowerCase()}`
 })
 
+
+
+// Function to get the values of the enum
+export function getEnumValues<E extends object>(enumObj: E): number[] {
+    return Object.values(enumObj).filter(value => typeof value === 'number') as number[];
+}

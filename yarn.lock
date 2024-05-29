@@ -167,6 +167,11 @@
   resolved "https://registry.yarnpkg.com/@next/env/-/env-14.1.4.tgz#432e80651733fbd67230bf262aee28be65252674"
   integrity sha512-e7X7bbn3Z6DWnDi75UWn+REgAbLEqxI8Tq2pkFOFAMpWAWApz/YCUhtWMWn410h8Q2fYiYL7Yg5OlxMOCfFjJQ==
 
+"@next/env@^14.2.3":
+  version "14.2.3"
+  resolved "https://registry.yarnpkg.com/@next/env/-/env-14.2.3.tgz#d6def29d1c763c0afb397343a15a82e7d92353a0"
+  integrity sha512-W7fd7IbkfmeeY2gXrzJYDx8D2lWKbVoTIj1o1ScPHNzvp30s1AuoEFSdr39bC5sjxJaxTtq3OTCZboNp0lNWHA==
+
 "@next/swc-darwin-arm64@14.1.4":
   version "14.1.4"
   resolved "https://registry.yarnpkg.com/@next/swc-darwin-arm64/-/swc-darwin-arm64-14.1.4.tgz#a3bca0dc4393ac4cf3169bbf24df63441de66bb7"
@@ -1927,14 +1932,15 @@
   resolved "https://registry.yarnpkg.com/@uidotdev/usehooks/-/usehooks-2.4.1.tgz#4b733eaeae09a7be143c6c9ca158b56cc1ea75bf"
   integrity sha512-1I+RwWyS+kdv3Mv0Vmc+p0dPYH0DTRAo04HLyXReYBL9AeseDWUJyi4THuksBJcu9F0Pih69Ak150VDnqbVnXg==
 
-"@unbody-io/ts-client@^0.0.8":
-  version "0.0.8"
-  resolved "https://registry.yarnpkg.com/@unbody-io/ts-client/-/ts-client-0.0.8.tgz#ef5b10de75fb49d0bb9a9f50ee5af1ac8eb74002"
-  integrity sha512-C3Mhv3ClHGtUR7CGnq1nE1ZV7tYuxV2mbejtWTh1P4xKW74h9vGwT/A3E5GuSTM6Y+aG1a2kaUG98m5mr4O6sA==
+"@unbody-io/ts-client@^0.0.15":
+  version "0.0.15"
+  resolved "https://registry.yarnpkg.com/@unbody-io/ts-client/-/ts-client-0.0.15.tgz#ddb271ea26a0cfb42cdfdab4e4d04e16faa28b26"
+  integrity sha512-bYLAzl4svlndF7cBk9RaJQChylJQ1yfpVb5CKQq8dFJZzIcjJFczPfA+gyMTVp4Vmec1GPc3sgeA5FTnJuNkSg==
   dependencies:
     axios "^1.4.0"
     json-to-graphql-query "^2.2.5"
     lodash "^4.17.21"
+    utility-types "^3.11.0"
 
 acorn-walk@^8.1.1:
   version "8.3.2"
@@ -3319,6 +3325,11 @@ util-deprecate@^1.0.2:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/util-deprecate/-/util-deprecate-1.0.2.tgz#450d4dc9fa70de732762fbd2d4a28981419a0ccf"
   integrity sha512-EPD5q1uXyFxJpCrLnCc1nHnq3gOa6DZBocAIiI2TaSCA7VCJ1UJDMagCzIkXNsUYfD1daK//LTEQ8xiIbrHtcw==
+
+utility-types@^3.11.0:
+  version "3.11.0"
+  resolved "https://registry.yarnpkg.com/utility-types/-/utility-types-3.11.0.tgz#607c40edb4f258915e901ea7995607fdf319424c"
+  integrity sha512-6Z7Ma2aVEWisaL6TvBCy7P8rm2LQoPv6dJ7ecIaIixHcwfbJ0x7mWdbcwlIM5IGQxPZSFYeqRCqlOOeKoJYMkw==
 
 v8-compile-cache-lib@^3.0.1:
   version "3.0.1"
