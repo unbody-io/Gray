@@ -1,1 +1,1 @@
-export const Article_CARD_HEIGHT = 120;
+export const Article_CARD_HEIGHT = 140;

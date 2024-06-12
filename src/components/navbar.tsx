@@ -1,20 +1,12 @@
 import React, {useState} from "react";
-import NextLink from "next/link";
-import {link as linkStyles} from "@nextui-org/theme";
-import {
-    Navbar as NextUINavbar,
-    NavbarBrand,
-    NavbarItem,
-} from "@nextui-org/navbar";
+import {Navbar as NextUINavbar, NavbarBrand,} from "@nextui-org/navbar";
 import clsx from "clsx";
 
-import {SearchBox, SearchBoxProps} from "@/components/SearchBox";
-import {Button} from "@nextui-org/button";
-import {MenuIcon} from "@/components/icons";
 import {Menu} from "@/components/Menu";
+import {SearchBar, SearchBarProps} from "@/components/SearchBar";
 
 type NavbarProps = {
-    searchBoxProps?: SearchBoxProps
+    searchBoxProps?: SearchBarProps
 }
 
 export const Navbar = (props: NavbarProps) => {
@@ -23,39 +15,15 @@ export const Navbar = (props: NavbarProps) => {
     return (
         <>
             <NextUINavbar position="sticky"
-                          className={"bg-transparent px-0 pt-8 pb-10 max-w-screen-md"}
-                          style={{
-                              borderRadius: "0 0 25px 25px",
-                              overflow: "hidden"
-                          }}
+                          className={clsx(
+                              "bg-transparent px-0 pt-8 pb-10 w-full",
+                              "bg-gradient-to-b from-default-100 to-transparent",
+                              "-mb-4"
+                          )}
+                          isBlurred={false}
             >
-                <NavbarBrand>
-                    <div className="flex flex-row w-full gap-2 justify-center items-center rounded-xl">
-                        <Button
-                            isIconOnly={true}
-                            aria-label="Home"
-                            className={
-                                clsx([
-                                    "shadow-xl",
-                                    "bg-default-200/50",
-                                    "dark:bg-default/60",
-                                    "backdrop-blur-xl",
-                                    "backdrop-saturate-200",
-                                    "hover:bg-default-200/70",
-                                    "dark:hover:bg-default/70",
-                                ])
-                            }
-                            onClick={() => setIsMenuOpen(!isMenuOpen)}
-                        >
-                            {
-                                isMenuOpen?
-                                    <MenuIcon className={"fill-gray-400 h-[24px] rotate-1"} size={32}/>
-                                    :
-                                    <MenuIcon className={"fill-gray-400 h-[24px]"} size={32}/>
-                            }
-                        </Button>
-                        <SearchBox {...(props.searchBoxProps||{})}/>
-                    </div>
+                <NavbarBrand className={"flex justify-center"}>
+                    <SearchBar onSearch={() => {}} onClear={() => {}}/>
                 </NavbarBrand>
                 <Menu open={isMenuOpen}
                       onChange={setIsMenuOpen}

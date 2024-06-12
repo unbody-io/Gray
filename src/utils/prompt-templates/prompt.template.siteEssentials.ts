@@ -1,5 +1,5 @@
-import {renderPrompt} from "@/utils/prompt-templates/prompt.utils";
-import {PromptTemplate} from "@/types/prompt.types";
+import {parseJsonOutput, renderPrompt} from "@/utils/prompt-templates/prompt.utils";
+import {PromptTemplate, StructuredUserInput} from "@/types/prompt.types";
 import {SiteContextConfig, SiteType} from "@/types/data.types";
 import {getEnumValues} from "@/utils/data.utils";
 
@@ -36,7 +36,7 @@ const types: Record<RequiredKeys, string> = {
     title: "string"
 }
 
-export const siteEssentialsPrompt: PromptTemplate = {
+export const siteEssentialsPrompt: PromptTemplate<StructuredUserInput> = {
     create: (
         topics: string[],
         entities: string[],
@@ -79,20 +79,11 @@ export const siteEssentialsPrompt: PromptTemplate = {
                 examples: [
                     JSON.stringify(cleanExamples, null, 2),
                 ],
-                output: `the output should be in the following JSON format: \`\`\`json\n${JSON.stringify(cleanTypes, null, 2)}\n\`\`\``,
+                output: `the output should be in the following JSON format: \`\`\`json\n${JSON.stringify(cleanTypes, null, 2)}\n\`\`\` \n ignore this line - {tagName}`,
             }
         )
     },
-    parse: <T>(rawResult: string): T => {
-        try {
-            const cleanJsonString = rawResult.replace(/```json|```/g, '');
-            const data = JSON.parse(cleanJsonString);
-            return data as T;
-        } catch (e) {
-            return JSON.parse(rawResult) as unknown as T;
-        } finally {
-            console.log("Error parsing site essentials prompt", rawResult);
-        }
-        return rawResult as unknown as T;
+    parse: (rawResult: string) => {
+        return parseJsonOutput<StructuredUserInput>(rawResult);
     }
 }

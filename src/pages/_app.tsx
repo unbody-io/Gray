@@ -8,6 +8,8 @@ import {SWRConfig} from "swr";
 
 import "@/styles/globals.css";
 import {SiteDataProvider} from "@/context/context.site-data";
+import {SearchBarProvider} from "@/context/context.search-bar";
+
 
 export default function App({ Component, pageProps }: AppProps) {
   const router = useRouter();
@@ -19,7 +21,9 @@ export default function App({ Component, pageProps }: AppProps) {
 					fetcher: (url:string, ...rest) => fetch(url).then(res => res.json())
 				}}>
 					<SiteDataProvider>
-						<Component {...pageProps} />
+						<SearchBarProvider>
+							<Component {...pageProps} />
+						</SearchBarProvider>
 					</SiteDataProvider>
 				</SWRConfig>
 			</NextThemesProvider>

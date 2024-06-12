@@ -4,6 +4,8 @@ export const fields = [
     "remoteId",
     "subtitle",
     "autoSummary",
-    // "modifiedAt"
+    "pathString",
+    "modifiedAt",
+    "__typename",
 ] as const;
 

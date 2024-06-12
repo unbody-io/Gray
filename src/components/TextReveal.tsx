@@ -38,9 +38,9 @@ type Props = PropsWithChildren<{
 export const TextReveal = ({ children, onTransitionEnd, withDefaultSkeleton}: Props) => {
     const ref = useRef<HTMLDivElement>(null);
     const { lineHeight, lineWidth } = useContainerSizes(ref);
-    const widths = useLinePixelWidths(ref, children, lineWidth);
     const [revealedLines, setRevealedLines] = useState<number[]>([]);
     const [render, setRender] = useState(false);
+    const widths = useLinePixelWidths(ref, children, lineWidth);
     const lineCount = widths.length;
 
     useEffect(() => {
@@ -70,7 +70,6 @@ export const TextReveal = ({ children, onTransitionEnd, withDefaultSkeleton}: Pr
         setRender(lineCount > 0);
     }, [lineCount, children]);
 
-
     return (
         <div ref={ref} className="relative">
             <div className={`transition-all ${render||withDefaultSkeleton? 'opacity-1' : 'opacity-0'}`}>
@@ -82,10 +81,10 @@ export const TextReveal = ({ children, onTransitionEnd, withDefaultSkeleton}: Pr
                         {new Array(lineCount||4).fill(0).map((_, index) => (
                             <Skeleton
                                 key={index}
-                                className="w-full rounded-lg absolute bg-gray-200"
+                                className="w-full rounded-lg absolute bg-white/50 backdrop-blur-2xl"
                                 style={{
                                     height: `${lineHeight - 2}px`,
-                                    width: revealedLines.includes(index) ? `0%` : `${(widths[index]+10) / lineWidth * 100}%`,
+                                    width: revealedLines.includes(index) ? `0%` : `${index===3&&!lineCount?50:(widths[index]+10) / lineWidth * 100}%`,
                                     right: `${100 - ((widths[index]+10) / lineWidth * 100)}%`,
                                     transition: `all ${calculateTransitionSpeed(lineWidth)}ms`,
                                     top: `${index * lineHeight + 1}px`,

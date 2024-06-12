@@ -1,12 +1,14 @@
 import {SWRResponse} from "swr";
-import {MiniArticle, MiniTextBlock} from "@/types/data.types";
+import {ContentBlock, ImageBlock, MiniArticle, MiniTextBlock} from "@/types/data.types";
 import React from "react";
 import {BlockCard} from "@/components/BlockCard";
 import {TextBlockCardBody} from "@/components/TextBlockCard.Body";
 import {Button} from "@nextui-org/button";
+import {ImageBlockCardBody} from "@/components/ImageBlockCard.Body";
+import {SupportedContentTypes} from "@/types/plugins.types";
 
 type ArticleListProps = {
-    payload: SWRResponse<MiniTextBlock[], any>
+    payload: SWRResponse<ContentBlock[] | null, any>
     pageSize?: number
 }
 
@@ -14,12 +16,13 @@ export const BlockList = (props: ArticleListProps) => {
     const {payload: {data, isLoading, error}, pageSize = 3} = props;
     const [page, setPage] = React.useState(1);
 
+    if (error) return <div>Error</div>;
+    if (isLoading) return <div>Loading...</div>;
+    if (!data) return null;
+
     return (
         <div>
-            {isLoading && <div>Loading...</div>}
-            {error && <div>Error</div>}
             {
-                data && !isLoading &&
                 <div className={"flex flex-col gap-4"}>
                     <div className={"grid gap-6 grid-cols-2"}>
                         {
@@ -29,7 +32,22 @@ export const BlockList = (props: ArticleListProps) => {
                                     <BlockCard key={index}
                                                className={""}
                                     >
-                                        <TextBlockCardBody data={block as MiniTextBlock}/>
+                                        {
+                                            (() => {
+                                                switch (block.__typename) {
+                                                    case SupportedContentTypes.TextBlock:
+                                                        return (
+                                                            <TextBlockCardBody data={block as MiniTextBlock}/>
+                                                        )
+                                                    case SupportedContentTypes.ImageBlock:
+                                                        return (
+                                                            <ImageBlockCardBody data={block as ImageBlock}/>
+                                                        )
+                                                    default:
+                                                        return "null";
+                                                }
+                                            })()
+                                        }
                                     </BlockCard>
                                 ))
                         }
@@ -37,11 +55,11 @@ export const BlockList = (props: ArticleListProps) => {
                     <div className={"m-auto pt-4 flex gap-4"}>
                         {
                             page * pageSize < data.length &&
-                            <Button onClick={() => setPage(page+1)}>More</Button>
+                            <Button onClick={() => setPage(page + 1)}>More</Button>
                         }
                         {
                             page > 1 &&
-                            <Button onClick={() => setPage(page-1)}>Less</Button>
+                            <Button onClick={() => setPage(page - 1)}>Less</Button>
                         }
                     </div>
                 </div>

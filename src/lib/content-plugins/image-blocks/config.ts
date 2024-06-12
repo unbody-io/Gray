@@ -1,0 +1,15 @@
+export const fields = [
+    "url",
+    "width",
+    "height",
+    "autoCaption",
+    "autoOCR",
+    "autoTypes",
+    "order",
+    "alt",
+    "title",
+    "document.GoogleDoc.remoteId",
+    "document.GoogleDoc.slug",
+    "document.GoogleDoc.pathString",
+    "__typename",
+] as const;

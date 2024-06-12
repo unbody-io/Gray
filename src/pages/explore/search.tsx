@@ -1,74 +1,87 @@
 import DefaultLayout from "@/layouts/default";
 import {useRouter} from "next/router";
-import useSWR from "swr";
-import {AskEndpointResponse, MiniArticle, MiniTextBlock, SearchContextResponse} from "@/types/data.types";
 
-import {Spacer} from "@nextui-org/react";
-import React, {useEffect, useState} from "react";
-import {QaResults} from "@/components/explore/QaResults";
-import {SearchContextPanel} from "@/components/explore/Search.Context";
+import React, {useEffect} from "react";
 
 import {SearchResultsList} from "@/components/SearchResult.List";
-import {buildQueryUrl} from "@/utils/query.utils";
-
+import {ApiTypes} from "@/types/api.type";
+import {useApiPost} from "@/services/api.service";
+import {ParagraphSkeleton} from "@/components/skeletons";
+import {BlogIntro} from "@/components/BlogIntro";
+import {useSiteData} from "@/context/context.site-data";
+import {Progress} from "@nextui-org/react";
 
 export default function ExplorePage() {
-    const {query: queryParams} = useRouter();
-    const [showQaLabel, setShowQaLabel] = React.useState(false);
-    const [showRelatedObjects, setShowRelatedObjects] = React.useState(false);
+    const {query, filters} = useRouter().query;
+    const {context} = useSiteData();
 
-    const [refactoredQueryForArticles, setRefactoredQueryForArticle] = useState(queryParams.query);
-    const [refactoredQueryForBlocks, setRefactoredQueryForBlocks] = useState(queryParams.query);
+    const structuredInput = useApiPost<ApiTypes.Rq.ParsedQuery, ApiTypes.Rs.ParsedQuery>(
+        "/api/parse-query"
+    );
+    const aiResponse = useApiPost<ApiTypes.Rq.Search, ApiTypes.Rs.AISearchSummary<any>>(
+        "/api/search/search-summary",
+    );
+    const results = useApiPost<ApiTypes.Rq.Search, ApiTypes.Rs.SearchResults>(
+        '/api/search/mix'
+    );
 
-    const ask = useSWR<AskEndpointResponse>(buildQueryUrl(`/api/search/ask`, queryParams, ['query']));
-    const context = useSWR<SearchContextResponse>(buildQueryUrl(`/api/search/context`, queryParams, ['query', 'entities', 'topics', 'keywords']));
-
-    const relatedArticles = useSWR<MiniArticle[]>(buildQueryUrl(`/api/search/articles`, { ...queryParams, query: refactoredQueryForArticles|| queryParams.query }, ['query', 'entities', 'topics', 'keywords']));
-    const relatedBlocks = useSWR<MiniTextBlock[]>(buildQueryUrl(`/api/search/blocks`, {...queryParams, query: refactoredQueryForBlocks|| queryParams.query}, ['query', 'entities', 'topics', 'keywords']));
+    const covertFilters = (filters: string | string[]): string[] => {
+        if (!filters) {
+            return [];
+        }
+        if (Array.isArray(filters)) {
+            return filters;
+        }
+        return filters.split(",");
+    }
 
     useEffect(() => {
-        // When context data is available, check for conditions to update articleQuery
-        if(context.data && context.data.concepts) {
-            if(
-                !relatedArticles.isLoading && relatedArticles.data && relatedArticles.data.length === 0
-            ){
-                setRefactoredQueryForArticle(context.data.concepts);
-            }
+        structuredInput.exec({
+            input: query as string,
+            filters: covertFilters(filters as string | string[])
+        });
+    }, [filters, query]);
 
-            if (
-                !relatedBlocks.isLoading && relatedBlocks.data && relatedBlocks.data.length === 0
-            ){
-                setRefactoredQueryForBlocks(context.data.concepts);
+    useEffect(() => {
+        if (structuredInput.data && (query||filters)) {
+            console.log("Structured Input", structuredInput.data)
+            const requestPayload = {
+                input: structuredInput.data,
+                filters: covertFilters(filters as string | string[])
             }
+            aiResponse.exec(requestPayload);
+            results.exec(requestPayload);
         }
-    }, [context.data, relatedArticles.data, relatedArticles.isLoading]);
-
-
-    console.log(ask.data, showQaLabel)
+    }, [structuredInput.data]);
 
     return (
         <DefaultLayout>
-            <div className={"min-h-[100px]"}>
+            <div className={"pt-4"}>
                 {
-                    <SearchContextPanel payload={context}
-                                        onAnimationDone={() => {
-                                            setShowQaLabel(true)
-                                            setTimeout(() => {
-                                                setShowRelatedObjects(true)
-                                            }, 1000);
-                                        }}
-                    />
-                }
-                <Spacer y={4}/>
-                {
-                    (context.data && context.data.isQuestion) &&
-                    <QaResults payload={ask}/>
+                    (aiResponse.isLoading || structuredInput.isLoading) ?
+                        <ParagraphSkeleton/>
+                        :
+                        <BlogIntro entities={context.autoEntities}
+                                   topics={context.autoTopics}
+                                   keywords={context.autoKeywords}
+                                   isStackOpen={false}
+                                   summary={aiResponse.data?.summary || "No summary available"}
+                        />
                 }
             </div>
             {
-                <SearchResultsList articles={relatedArticles}
-                                   blocks={relatedBlocks}
-                />
+                (results.isLoading||structuredInput.isLoading) ?
+                    <Progress
+                        size="sm"
+                        isIndeterminate
+                        aria-label="Loading..."
+                        label={structuredInput.isLoading? "Understanding what you asked...": "Finding relevant results..."}
+                    />
+                    :
+                    <SearchResultsList results={results}
+                                       isQueryLoading={structuredInput.isLoading}
+                    />
+
             }
         </DefaultLayout>
     )

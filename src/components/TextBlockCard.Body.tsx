@@ -1,14 +1,14 @@
-import {MiniTextBlock} from "@/types/data.types";
-import {CardBody, CardFooter, CardHeader, CardProps} from "@nextui-org/react";
+import {CardBody, CardFooter, CardHeader} from "@nextui-org/react";
 import React, {HTMLProps} from "react";
 import clsx from "clsx";
 import {Link} from "@nextui-org/link";
 import {Button} from "@nextui-org/button";
 import {RightArrow} from "@/components/icons";
+import {EnhancedTextBlock} from "@/types/custom.type";
 
 
 type Props = {
-    data: MiniTextBlock;
+    data: EnhancedTextBlock;
     htmlProps?: HTMLProps<HTMLDivElement>
 }
 
@@ -37,7 +37,7 @@ export const TextBlockCardBody = (props: Props) => {
                     }
                     <Button className="text-tiny"
                             size={"sm"}
-                            variant={"flat"}
+                            variant={"light"}
                             isIconOnly={true}
                     >
                         <RightArrow/>

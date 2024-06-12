@@ -1,126 +1,198 @@
-import React, {PropsWithChildren} from "react";
-import {MiniArticle, MiniTextBlock} from "@/types/data.types";
-import {SWRResponse} from "swr";
-import {ArticleCard} from "@/components/ArticleCard";
-import {ArticleCardBody} from "@/components/ArticleCard.Body";
-import {Button} from "@nextui-org/button";
-import {BlockCard} from "@/components/BlockCard";
-import {TextBlockCardBody} from "@/components/TextBlockCard.Body";
-import {LoadingIcon} from "@/components/icons";
+import React, {PropsWithChildren, useMemo} from "react";
+import {UseApiHook} from "@/services/api.service";
+import {ApiTypes} from "@/types/api.type";
+import {useSiteData} from "@/context/context.site-data";
+import {SupportedContentTypes} from "@/types/plugins.types";
+import {EnhancedTextBlock} from "@/types/custom.type";
+import {IImageBlock} from "@unbody-io/ts-client/build/core/documents";
+import {Progress} from "@nextui-org/react";
 
-type CategoryListProps = {
+type ListProps = {
     onOpen?: (index: number) => void
     onClosed?: () => void
-    articles: SWRResponse<MiniArticle[]> | null
-    blocks: SWRResponse<MiniTextBlock[]> | null
+    results: UseApiHook<any, ApiTypes.Rs.SearchResults>
+    isQueryLoading: boolean
 } & PropsWithChildren<{}>
 
-type ListItemProps = PropsWithChildren<{
-    loading: boolean
-    error?: any
-    pageSize: number
-    itemName: string
-    wrapperClassName?: string
-    listClassName?: string
-}>
+type Block = (EnhancedTextBlock | IImageBlock);
 
-const List = ({children, loading, pageSize, error, itemName,wrapperClassName, listClassName}: ListItemProps) => {
-    const [page, setPage] = React.useState(1);
-    const maxSize = React.Children.count(children);
+export const SearchResultsList = ({results, isQueryLoading}: ListProps) => {
+    const {components, configs: {plugins}} = useSiteData();
 
-    const loadingLabel = `Loading ${itemName}...`;
-    const noResultsLabel = `No ${itemName} found`;
-    const label = `${itemName}`;
+    if (results.isLoading) {
+        return (
+            <div>Loading...</div>
+        )
+    }
 
-    return (
-        <div className={wrapperClassName}>
-            {
-                <div className={"flex flex-row items-center gap-1"}>
-                    {
-                        loading &&
-                        <LoadingIcon className={"animate-spin h-2 w-2 text-current"}/>
+    if (results.error) {
+        return (
+            <div>
+                Error
+            </div>
+        )
+    }
+
+    if (!results.data || results.data.length === 0) {
+        return (
+            <div>
+                No search results found
+            </div>
+        )
+    }
+
+    const {posts, refBlocks}: {
+        posts: ApiTypes.Rs.SearchResults,
+        refBlocks: Block[]
+    } = useMemo(() => {
+        const _refBlocks: Block[] = [];
+        let _refBlocksIds: string[] = [];
+
+        results.data?.forEach(resultsPerContentType => {
+            if (
+                (
+                    resultsPerContentType.type === SupportedContentTypes.ImageBlock
+                    || resultsPerContentType.type === SupportedContentTypes.TextBlock
+                )
+                && resultsPerContentType.data.length > 0
+            ) {
+                resultsPerContentType.data.forEach(block => {
+                    const isRef = results.data!.some((p) => {
+                        // because one type can not be a ref to its own type
+                        if (p.type === resultsPerContentType.type) return false;
+
+                        const plugin = plugins.find(pl => pl.type === p.type);
+                        return p.data.some(d => {
+                            // @ts-ignore
+                            return d[plugin?.identifier] === block.document[0][plugin?.identifier]
+                        })
+                    });
+                    if (isRef) {
+                        _refBlocks.push(block as Block);
+                        // @ts-ignore
+                        _refBlocksIds.push(block.document[0].id);
                     }
-
-                    <span className={"text-sm"}>
-                        {
-                            loading? loadingLabel:
-                                error? "Error loading data"
-                                    : maxSize > 0? `${maxSize} ${label}`
-                                        : noResultsLabel
-                        }
-                    </span>
-                </div>
+                })
             }
-            {
-                maxSize > 0 &&
-                <>
-                    <div className={listClassName}>
-                        {React.Children.toArray(children).slice(0, page * pageSize)}
-                    </div>
-                    <div className={"m-auto pt-4 flex gap-4"}>
-                        {
-                            page * pageSize < maxSize &&
-                            <Button onClick={() => setPage(page + 1)}>More</Button>
-                        }
-                        {
-                            page > 1 &&
-                            <Button onClick={() => setPage(page - 1)}>Less</Button>
-                        }
-                    </div>
-                </>
-            }
-        </div>
-    )
-}
+        });
 
-export const SearchResultsList = ({articles, blocks, children}: CategoryListProps) => {
+
+        const posts = results.data?.filter(r => {
+            const plugin = plugins.find(pl => pl.type === r.type);
+            return (
+                r.data.length > 0
+                && !r.data.some(d => {
+                    // @ts-ignore
+                    return _refBlocksIds.includes(d[plugin?.identifier])
+                })
+            )
+        }) as ApiTypes.Rs.SearchResults;
+
+        return {posts, refBlocks: _refBlocks};
+    }, [results.data]);
+
     return (
-        <div>
+        <div className={"flex flex-col gap-8"}>
             {
-                articles&&
-                <List loading={articles.isLoading}
-                      error={articles.error}
-                      pageSize={2}
-                      itemName={"Related Articles"}
-                      wrapperClassName={"flex flex-col gap-4"}
-                      listClassName={"flex flex-col gap-4"}
+                posts
+                    .filter(result => (
+                        result.type in components.perContentType
+                    ))
+                    .map((result, i) => {
+                        const component = components.perContentType[result.type];
+                        const plugin = plugins.find(plugin => plugin.type === result.type);
 
-                >
-                    {
-                        articles.data &&
-                        articles.data.map((article, i) => (
-                            <ArticleCard key={`a-${i}`}
-                                         className={"bg-default-200/100 pb-3"}
+                        const ListComponent = component.list.component
+                        const CardComponent = component.card.component;
+                        const CardWithRefsComponent = component.card_with_refs.component;
+
+                        if (!(ListComponent && (CardComponent || CardWithRefsComponent)) || !plugin) {
+                            console.error(`List or Card component not found for type: ${result.type}`);
+                            return null;
+                        }
+
+                        // TODO we need to handle the component.list.loading state here
+                        return (
+                            <ListComponent key={i}
+                                           label={plugin?.label}
                             >
                                 {
-                                    <ArticleCardBody data={article}/>
+                                    result.data.map((data, j) => {
+                                        if (CardWithRefsComponent) {
+                                            return (
+                                                <CardWithRefsComponent key={j}
+                                                                       data={data}
+                                                                       postRefs={refBlocks.filter(b => {
+                                                                           // @ts-ignore
+                                                                           return (
+                                                                               // @ts-ignore
+                                                                               b.document[0][plugin.identifier] === data[plugin.identifier]
+                                                                           )
+                                                                       })}
+                                                />
+                                            )
+                                        }else if (CardComponent) {
+                                            return (
+                                                <CardComponent key={j}
+                                                               data={data}
+                                                />
+                                            )
+                                        }
+                                    })
                                 }
-                            </ArticleCard>
-                        ))
-                    }
-                </List>
+                            </ListComponent>
+                        )
+                    })
             }
-            {
-                blocks &&
-                <List loading={blocks.isLoading}
-                      error={blocks.error}
-                      pageSize={2}
-                      itemName={"Related Blocks"}
-                      listClassName={"grid gap-2 grid-cols-2"}
-                      wrapperClassName={"flex flex-col gap-4"}
-                >
-                    {
-                        blocks.data &&
-                        blocks.data.map((block, i) => (
-                            <BlockCard key={i}
-                                       className={""}
-                            >
-                                <TextBlockCardBody data={block as MiniTextBlock}/>
-                            </BlockCard>
-                        ))
-                    }
-                </List>
-            }
+
+            {/*{*/}
+            {/*    articles&&*/}
+            {/*    <List loading={articles.isLoading}*/}
+            {/*          error={articles.error}*/}
+            {/*          pageSize={2}*/}
+            {/*          itemName={"Related Articles"}*/}
+            {/*          wrapperClassName={"flex flex-col gap-4"}*/}
+            {/*          listClassName={"flex flex-col gap-4"}*/}
+
+            {/*    >*/}
+            {/*        {*/}
+            {/*            articles.data &&*/}
+            {/*            articles.data.map((article, i) => (*/}
+            {/*                <DefaultCard key={`a-${i}`}*/}
+            {/*                             className={"bg-default-200/100 pb-3"}*/}
+            {/*                >*/}
+            {/*                    {*/}
+            {/*                        <DefaultsArticleCardBody data={article}/>*/}
+            {/*                    }*/}
+            {/*                </DefaultCard>*/}
+            {/*            ))*/}
+            {/*        }*/}
+            {/*    </List>*/}
+            {/*}*/}
+            {/*{*/}
+            {/*    blocks &&*/}
+            {/*    <List loading={blocks.isLoading}*/}
+            {/*          error={blocks.error}*/}
+            {/*          pageSize={2}*/}
+            {/*          itemName={"Related Blocks"}*/}
+            {/*          listClassName={"grid gap-2 grid-cols-2"}*/}
+            {/*          wrapperClassName={"flex flex-col gap-4"}*/}
+            {/*    >*/}
+            {/*        {*/}
+            {/*            blocks.data &&*/}
+            {/*            blocks.data.map((block, i) => (*/}
+            {/*                <div>*/}
+            {/*                    {block.__typename}*/}
+            {/*                </div>*/}
+            {/*                // <BlockCard key={i}*/}
+            {/*                //            className={""}*/}
+            {/*                // >*/}
+            {/*                //     <TextBlockCardBody data={block as MiniTextBlock}/>*/}
+            {/*                // </BlockCard>*/}
+            {/*            ))*/}
+            {/*        }*/}
+            {/*    </List>*/}
+            {/*}*/}
         </div>
     )
 }

@@ -1,25 +1,28 @@
 import React from 'react';
-import {NameEntity, Topic} from "@/types/data.types";
-import {TypeEffect} from "@/components/TypeEffect";
 import {TextReveal} from "@/components/TextReveal";
 import {InteractiveParagraph} from "@/components/InteractiveParagraph";
 import {ESearchMode} from "@/types/ui.types";
 import {transformTag} from "@/utils/data.utils";
+import clsx from "clsx";
 
 type Props = {
     isStackOpen: boolean
-    text: string
     topics: string[]
     entities: string[]
     keywords: string[]
+    summary: string
 }
 
 export const BlogIntro = (props: Props) => {
-    const {topics, text, keywords, entities, isStackOpen} = props;
+    const {topics, summary, keywords, entities, isStackOpen} = props;
     return (
-        <div className={`${isStackOpen ? "blur-md" : ""} transition-all ease-linear duration-1000 min-h-[160px]`}>
+        <div className={clsx(
+            `${isStackOpen ? "blur-md" : ""} transition-all ease-linear duration-1000 min-h-[160px]`,
+            "text-gray-800 text-small leading-6",
+            "prose"
+        )}>
             <TextReveal>
-                <InteractiveParagraph text={text}
+                <InteractiveParagraph text={summary}
                                       alwaysActive={true}
                                       tags={[
                                           ...topics.map((topic) => transformTag(topic, 'topics', ESearchMode.Search)),

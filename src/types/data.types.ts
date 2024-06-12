@@ -7,6 +7,8 @@ import {
 } from "@unbody-io/ts-client/build/core/documents";
 import {id} from "postcss-selector-parser";
 import {TextBlock} from "@unbody-io/ts-client/build/types/TextBlock.types";
+import {SupportedContentTypes} from "@/types/plugins.types";
+import {NextLogConfigData} from "@/types/nexlog.types";
 
 export type NameEntity = {
     entity: string
@@ -38,9 +40,27 @@ export type CategoryRaw = {
 }
 
 export type Category = Pick<CategoryRaw, "title"|"summary"|"topics"|"entities"> & {
-    articles: MiniArticle[];
-    blocks: Array<MiniTextBlock|ImageBlock>;
-    videos: IVideoFile[];
+    items: PostRef[];
+}
+
+export type PostRef = {
+    __typename: SupportedContentTypes;
+} & {[key: string]: string};
+
+export type Directory = {
+    name: string;
+    title: string;
+    text: string;
+    html: string;
+
+    autoEntities: string[];
+    autoTopics: string[];
+    autoKeywords: string[];
+    autoSummary: string;
+
+    cover: IImageBlock;
+
+    items: PostRef[];
 }
 
 export type Topic = {
@@ -53,7 +73,11 @@ export enum EMiniArticleKeys{
     slug = "slug",
     summary = "summary",
     modifiedAt = "modifiedAt",
-    subtitle = "subtitle"
+    subtitle = "subtitle",
+    pathString = "pathString",
+    typeName= "__typename",
+    id= "remoteId",
+    autoSummary = "autoSummary",
 }
 
 export type MiniArticleKeys =
@@ -61,10 +85,13 @@ export type MiniArticleKeys =
     | EMiniArticleKeys.slug
     | EMiniArticleKeys.summary
     | EMiniArticleKeys.title
-    | EMiniArticleKeys.subtitle;
+    | EMiniArticleKeys.subtitle
+    | EMiniArticleKeys.pathString
+    | EMiniArticleKeys.typeName
+    | EMiniArticleKeys.id
+    | EMiniArticleKeys.autoSummary;
 
 export type MiniArticle = Pick<IGoogleDoc, MiniArticleKeys>;
-
 
 export enum EMiniTextBlockKeys{
     html = "html",
@@ -73,7 +100,8 @@ export enum EMiniTextBlockKeys{
     title = "document.GoogleDoc.title",
     classNames = "classNames",
     text = "text",
-    certainty = "_additional.certainty"
+    certainty = "_additional.certainty",
+    typeName = "__typename"
 }
 export type MiniTextBlockKeys =
     EMiniTextBlockKeys.html
@@ -83,32 +111,36 @@ export type MiniTextBlockKeys =
     | EMiniTextBlockKeys.title
     | EMiniTextBlockKeys.classNames
     | EMiniTextBlockKeys.certainty
+    | EMiniTextBlockKeys.typeName;
 
-// @ts-ignore
-export type MiniTextBlock = Pick<ITextBlock, MiniTextBlockKeys> & {
+export type MiniTextBlock = ITextBlock & {
     document: {
        slug: string
        title: string
     }[]
     _additional: AdditionalProps
-}
+};
+
+
+export type ImageBlock = {
+    url: string;
+    alt: string;
+    width: number;
+    height: number;
+    _additional: AdditionalProps
+    document: {
+        slug: string
+        title: string
+    }[]
+} &  IImageBlock;
 
 
 export type SiteData = {
     context: SiteContext
     categories: Category[]
+    directories: Directory[]
     socials: {label: string, link: string, provider: string}[]
-}
-
-export enum QueryContextKey {
-    topic = "topics",
-    keyword = "keywords",
-    entity = "entities"
-}
-
-export type QueryContextItem = {
-    key: QueryContextKey;
-    value: string| string[] | undefined;
+    configs: NextLogConfigData;
 }
 
 
@@ -130,26 +162,16 @@ export type ReadPageData = {
     from: TextBlock[]
 }
 
-
-export interface ImageBlock extends IImageBlock{
-    url: string;
-    alt: string;
-    width: number;
-    height: number;
-    _additional: AdditionalProps
-}
-
-
 export type SiteContext = {
     title: string;
 
-    autoSummary: string;
+    autoSummary: string|null;
     autoKeywords: string[];
     autoTopics: string[];
     autoEntities: string[];
 
     contentSummary: string;
-    availableContentTypes: string[]
+    availableContentTypes: SupportedContentTypes[]
 
     seoKeywords: string[];
     seoDescription: string;
@@ -187,3 +209,4 @@ export enum SiteType {
 }
 
 
+export type ContentBlock = ImageBlock | MiniTextBlock;

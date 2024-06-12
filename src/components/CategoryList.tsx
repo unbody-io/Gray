@@ -1,9 +1,7 @@
 import {CategoryCardStack} from "@/components/CategoryCard.Stack";
 import React from "react";
 import {Category} from "@/types/data.types";
-import {FadeIn} from "@/components/Transitions";
-import {useTimer} from "@/utils/ui.utils";
-import {Divider, Progress} from "@nextui-org/react";
+import clsx from "clsx";
 
 type CategoryListProps = {
     categories: Category[]
@@ -15,7 +13,6 @@ export const CategoryList = ({categories, onOpen, onClosed}: CategoryListProps) 
     const ref = React.useRef<HTMLDivElement>(null);
     const [openIndex, setOpenIndex] = React.useState<number>(-1);
     const [translateY, setTranslateY] = React.useState<number>(0);
-    // const isTimeUp = useTimer(1000);
 
     const handleOpen = (i: number) => {
         if (openIndex === i) {
@@ -25,7 +22,6 @@ export const CategoryList = ({categories, onOpen, onClosed}: CategoryListProps) 
         } else {
             setOpenIndex(i)
             onOpen && onOpen(i)
-
             if (ref.current) {
                 const clickedChild = ref.current.children[i] as HTMLElement;
                 const offset = clickedChild.getBoundingClientRect().top
@@ -35,9 +31,9 @@ export const CategoryList = ({categories, onOpen, onClosed}: CategoryListProps) 
     }
 
     return (
-        <>
+        <div className={"relative"}>
             {
-                <div className={"flex flex-col gap-16 transition-all duration-750 ease-in-out"}
+                <div className={"flex flex-col gap-16 transition-all duration-750 ease-in-out relative z-10"}
                      ref={ref}
                      style={{
                          transform: `translateY(${translateY}px)`
@@ -66,6 +62,17 @@ export const CategoryList = ({categories, onOpen, onClosed}: CategoryListProps) 
 
                 </div>
             }
-        </>
+            {
+                openIndex > -1 &&
+                <div className={clsx(
+                    "w-[100vw] h-[100vh]",
+                    "fixed top-0 left-0",
+                    "backdrop-blur",
+                    "transition-all duration-500 ease-in-out",
+                    `${openIndex > -1? "opacity-100":"z-0 opacity-0"}`,
+                    `${openIndex > -1? "animate-fadeIn":"animate-fadeOut"}`
+                )}/>
+            }
+        </div>
     )
 }

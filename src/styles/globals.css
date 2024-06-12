@@ -2,6 +2,11 @@
 @tailwind components;
 @tailwind utilities;
 
+
+.gradient-text{
+    @apply bg-gradient-to-r inline-block text-transparent bg-clip-text;
+}
+
 .chip{
     @apply rounded-full capitalize text-center relative max-w-fit min-w-min inline-flex items-center justify-between box-border whitespace-nowrap bg-transparent py-0;
     transition: all 250ms;
@@ -31,4 +36,41 @@
 
 em{
     @apply text-primary;
+}
+
+
+.TextBlock .TextBlockTag{
+    @apply relative tap-highlight-transparent outline-none no-underline hover:opacity-80 transition-all duration-1000 max-w-fit min-w-min inline-flex items-center justify-between box-border whitespace-nowrap rounded-full bg-transparent text-default-foreground;
+}
+
+.TextBlock .TextBlockTag:before{
+    @apply absolute top-0 h-full rounded-full px-2 transition-all duration-1000;
+    width: calc(100% + 1rem);
+    left: -0.25rem;
+    content: '';
+    z-index: -1;
+}
+
+.TextBlock.TextBlockActive .TextBlockTag.entity:before{
+    @apply bg-primary/40 text-primary;
+}
+
+.TextBlock.TextBlockActive .TextBlockTag.topic:before{
+    @apply bg-default/40 text-default-foreground;
+}
+
+.TextBlock.TextBlockActive .TextBlockTag.keyword:before{
+    @apply bg-default/40 text-default-foreground;
+}
+
+
+mux-player::part(center play button) {
+    display: none;
+}
+
+.VideoPlayerMini::part(seek-backward),
+.VideoPlayerMini::part(seek-forward),
+.VideoPlayerMini::part(control-bar),
+.VideoPlayerMini::part(range){
+    display: none;
 }

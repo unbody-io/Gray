@@ -1,13 +1,19 @@
-import {SupportedContentTypes} from "@/types/plugins.types";
+import {NextlogConfig} from "@/types/nexlog.types";
 import {ContentHandler} from "@/lib/content-plugins";
+import {defaultVideoFileHandlerOptions} from "@/lib/content-plugins/video-files";
+import {videoComparator, videoEnhancer} from "@/lib/ai-thinkerers/content";
 
-export default {
+const configs: NextlogConfig ={
     contentPlugins: [
         new ContentHandler<any, any>({
-            fetcher: async () => ([{}]),
-            enhancer: async (rawData) => rawData,
-            summarizer: () => "rawData",
-            type: SupportedContentTypes.VideoFile
+            ...defaultVideoFileHandlerOptions,
+            enhancer: videoEnhancer,
+            comparator: videoComparator,
+            summarizer: ({originalName, autoSummary}) => {
+                return `${originalName} - ${autoSummary}`
+            },
         })
     ]
 }
+
+export default configs;

@@ -1,5 +1,5 @@
 import Imgix from "react-imgix";
-import {ImageBlock} from "@/types/data.types";
+import {ImageBlock} from "@/types/custom.type";
 
 type Props = {
     data: ImageBlock
@@ -16,7 +16,7 @@ export const UnbodyImage = ({data}: Props) => {
         >
             <Imgix src={data.url as string}
                    htmlAttributes={{
-                       alt: data.alt as string,
+                       alt: data.alt||data.autoCaption as string,
                        title: data.alt as string,
                        src: `${data.url}?w=20&blur=100fm=webp&q=75`,
                        style: {

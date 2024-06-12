@@ -1,8 +1,8 @@
 import {PromptTemplate} from "@/types/prompt.types";
 import {renderPrompt} from "@/utils/prompt-templates/prompt.utils";
-import {SiteContext} from "@/types/data.types";
+import {CategoryRaw, SiteContext} from "@/types/data.types";
 
-export const categoriesPrompt: PromptTemplate = {
+export const categoriesPrompt: PromptTemplate<CategoryRaw[]|null> = {
     create: ({autoTopics, autoEntities}: SiteContext) => renderPrompt(
         {
             // introduction: "Analyze given articles which are about given topics and entities bellow, and Create 3 unique categories that organize the articles into thematic groups. These categories should",
@@ -15,9 +15,10 @@ export const categoriesPrompt: PromptTemplate = {
                 "- **title**: A creative and descriptive title.",
                 "- **summary**: A concise summary, one or two sentence, encapsulating the category's essence.",
                 "- **topics**: A list of main topics related to this category, derived from given topics",
-                "- **entities**: A list of main name entities related to this category, derived from given entities."
+                "- **entities**: A list of main name entities related to this category, derived from given entities.",
+                "ignore this line - {tagName}"
             ],
-            output: (`\`\`\`json [
+            output: (`Output has to be exactly like the following JSON format:\n \`\`\`json [
                                 {
                                   "title": "Creative Category Title 1",
                                   "summary": "Summary of what this category covers.",
@@ -28,16 +29,16 @@ export const categoriesPrompt: PromptTemplate = {
 		            ] \`\`\``),
         }
     ),
-    parse: <T>(rawResult: string): T  => {
+    parse: (rawResult: string): CategoryRaw[]|null  => {
         try{
             const cleanJsonString = rawResult.replace(/```json|```/g, '');
-            const data = JSON.parse(cleanJsonString);
-            return data as T;
+            const data = JSON.parse(cleanJsonString.toLowerCase());
+            return data as CategoryRaw[];
         }catch (e){
-            return JSON.parse(rawResult) as unknown as T;
+            return JSON.parse(rawResult) as unknown as CategoryRaw[];
         }finally {
 
         }
-        return rawResult as unknown as T;
+        return null;
     }
 }

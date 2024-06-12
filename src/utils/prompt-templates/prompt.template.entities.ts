@@ -1,7 +1,7 @@
 import {PromptTemplate} from "@/types/prompt.types";
 import {renderPrompt} from "@/utils/prompt-templates/prompt.utils";
 
-export const entitiesPrompt: PromptTemplate = {
+export const entitiesPrompt: PromptTemplate<any> = {
     create: () => renderPrompt(
         {
             introduction: "Analyze given articles and Identify and list the entities (e.g., people, places, organizations) mentioned in the articles.",

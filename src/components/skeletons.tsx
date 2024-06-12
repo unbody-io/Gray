@@ -8,9 +8,9 @@ export const LineSkeleton = ({className}: {className: string}) => (
 )
 
 export const ParagraphSkeleton = () => (
-    <div className="space-y-3 w-full">
-        <LineSkeleton className="w-4/5 h-4"/>
-        <LineSkeleton className="w-5/5 h-4"/>
-        <LineSkeleton className="w-3/5 h-4"/>
+    <div className="space-y-2 w-full">
+        <LineSkeleton className="w-4/5 h-5"/>
+        <LineSkeleton className="w-5/5 h-5"/>
+        <LineSkeleton className="w-3/5 h-5"/>
     </div>
 )

@@ -1,4 +1,3 @@
-import {SiteConfigs} from "@/types/data.types";
 import {
     Modal,
     ModalContent,
@@ -17,7 +16,7 @@ type Props = {
 
 export const Menu = (props: Props) => {
     const {open, onChange} = props;
-    const {siteData, siteConfig} = useSiteData();
+    const {context} = useSiteData();
 
     const {isOpen, onOpen, onOpenChange} = useDisclosure({
         isOpen: open
@@ -38,7 +37,7 @@ export const Menu = (props: Props) => {
                 {
                     (onClose) => (
                         <>
-                            <ModalHeader>{siteConfig?.title}</ModalHeader>
+                            <ModalHeader>{context?.title}</ModalHeader>
                             <ModalBody>
                                 body
                             </ModalBody>

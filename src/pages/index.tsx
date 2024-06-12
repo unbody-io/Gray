@@ -2,29 +2,50 @@ import type {InferGetStaticPropsType, GetStaticProps} from 'next'
 import DefaultLayout from "@/layouts/default";
 import React from "react";
 import {SiteData} from "@/types/data.types";
+
 import {BlogIntro} from "@/components/BlogIntro";
 import {CategoryList} from "@/components/CategoryList";
-import {readSiteData} from "@/services/data.service";
+import {readFile} from "fs/promises";
+import {SITE_DATA_PATH} from "@/prebuild-data/configs";
+import {DirectoryList} from "@/components/DirectoryList";
+import {SectionTitle} from "@/components/SectionTitle";
 
-type IndexPageProps = {} & SiteData
+type IndexPageProps = {
+    siteData: SiteData
+}
 
 export default function Page(props: InferGetStaticPropsType<typeof getStaticProps>) {
-    const {topics, entities, keywords, categories, intro} = props;
+    const {
+        siteData: {directories, categories, context},
+    } = props;
+
     const [isCatListOpen, setIsCatListOpen] = React.useState(false);
 
     return (
         <DefaultLayout>
+            {
+                context.autoSummary&&
+                <section>
+                    <BlogIntro entities={context.autoEntities}
+                               topics={context.autoTopics}
+                               keywords={context.autoKeywords}
+                               isStackOpen={isCatListOpen}
+                               summary={context.autoSummary}
+                    />
+                </section>
+            }
             <section>
-                <BlogIntro entities={entities}
-                           topics={topics}
-                           keywords={keywords}
-                           isStackOpen={isCatListOpen}
-                           text={intro}
-                />
+                <SectionTitle>
+                    Directories
+                </SectionTitle>
+                <DirectoryList data={[...directories, ...directories, ...directories, ...directories]} />
             </section>
             <section>
+                <SectionTitle>
+                    Explore by topic
+                </SectionTitle>
                 <CategoryList categories={categories}
-                              onOpen={(index) => setIsCatListOpen(true)}
+                              onOpen={() => setIsCatListOpen(true)}
                               onClosed={() => setIsCatListOpen(false)}
                 />
             </section>
@@ -32,12 +53,11 @@ export default function Page(props: InferGetStaticPropsType<typeof getStaticProp
     )
 }
 
-
 export const getStaticProps = (async (context) => {
-    const siteData = await readSiteData();
+    const siteData = await readFile(SITE_DATA_PATH, "utf-8").then((data) => JSON.parse(data));
     return {
         props: {
-            ...siteData,
+            siteData
         }
     }
 

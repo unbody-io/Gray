@@ -1,7 +1,7 @@
-import {AutoFields} from "@/types/data.types";
 import React, {useMemo} from "react";
 import {highlightTags} from "@/components/TextWithHighlights";
 import {TagProps, ESearchMode} from "@/types/ui.types";
+import clsx from "clsx";
 
 type IProps = {
     text: string;
@@ -28,10 +28,13 @@ export const InteractiveParagraph = (props: IProps) => {
     }, [text, tags]);
 
     return (
-        <div dangerouslySetInnerHTML={{__html: h}}
+        <article
+            dangerouslySetInnerHTML={{__html: h}}
              onMouseEnter={handleMouseEnter}
              onMouseLeave={handleMouseLeave}
-             className={active ? "active" : ""}
+             className={clsx(
+                 active ? "active" : "",
+             )}
         />
     )
 }

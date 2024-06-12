@@ -1,4 +1,4 @@
-import React, {ReactChildren, ReactNode, RefObject, useEffect, useLayoutEffect, useState} from "react";
+import React, {ReactNode, RefObject, useEffect, useLayoutEffect, useState} from "react";
 import {AutoFields} from "@/types/data.types";
 import {KeywordColor} from "@/types/ui.types";
 
@@ -132,4 +132,8 @@ export function useLinePixelWidths(ref: RefObject<HTMLDivElement>, children: Rea
     }, [ref, children, maxWidth]);
 
     return linePixelWidths;
+}
+
+export const secondsToMinutes = (seconds: number) => {
+    return Math.floor(seconds / 60);
 }

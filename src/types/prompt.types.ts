@@ -13,8 +13,28 @@ export type PromptInput = {
 }
 
 
-export type PromptTemplate = {
+export type PromptTemplate<O extends any> = {
     create: (...args: any) => string;
-    parse: <T extends any>(rawResult: string) => T;
+    parse: (rawResult: string) => O|null;
     transform?: (data: any) => any;
+}
+
+export enum UserInputType {
+    SearchQuery = "Search Query",
+    Question = "Question",
+    Instruction = "Instruction",
+    ComplexTask = "Complex Task"
+}
+
+export type StructuredUserInput = {
+    type: UserInputType;
+    concepts_key_terms: string[];
+    core_question: string;
+    subject_topic: string[]|string;
+    specific_task: string;
+    output_format: string;
+    constraints: string;
+    context: string;
+    requires_search: boolean;
+    original_user_input: string;
 }

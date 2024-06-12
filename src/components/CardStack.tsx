@@ -39,7 +39,7 @@ export const CardStack = (props: Props) => {
     }, [childArray.length]);
 
     const getTopWhenOpen = (index: number) => {
-        return (index) * (height - 10) + gap;
+        return index*height + index*gap/2;
     }
     const getTopWhenClosed = (index: number) => {
         return hovering ? index * 10 : index * 7;
@@ -85,7 +85,7 @@ export const CardStack = (props: Props) => {
                                         style: {
                                             top: `${isOpen ? getTopWhenOpen(_index) : getTopWhenClosed(_index)}px`,
                                             left: `${(hovering || isOpen) ? 0 : getLeft(_index)}px`,
-                                            minHeight: `${isOpen ? height - 30 : height}px`,
+                                            minHeight: `${isOpen ? height : height}px`,
                                             zIndex: childCount + 1 - _index,
                                             transition: 'all 0.3s ease-in-out',
                                             ...style,

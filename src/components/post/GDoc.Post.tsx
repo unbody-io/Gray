@@ -1,8 +1,5 @@
 import {IGoogleDoc, IImageBlock, ITextBlock} from "@unbody-io/ts-client/build/core/documents";
-import parse from 'html-react-parser';
-import {renderToString} from "react-dom/server";
 import {uniqueBy} from "@/utils/data.utils";
-import Link from "next/link";
 import {FC, useMemo} from "react";
 import {UnbodyImage} from "@/components/Image";
 import {ImageBlock} from "@/types/data.types";
@@ -10,61 +7,17 @@ import Image from "next/image";
 import {windowScrollY} from "@/utils/ui.utils";
 import {formatDate} from "@/utils/date.utils";
 import {Divider} from "@nextui-org/react";
+import {EnhancedGDocWithContent} from "@/types/custom.type";
+import {TextBlock} from "@unbody-io/ts-client/build/types/TextBlock.types";
+import {SupportedContentTypes} from "@/types/plugins.types";
+import {TagProps} from "@/types/ui.types";
+import {ParagraphBlock} from "@/components/defaults/content-blocks/Block.Paragraph";
 
 type Props = {
-    data: IGoogleDoc
+    data: EnhancedGDocWithContent
 }
 
-
-interface Keyword {
-    value: string;
-    type: string
-}
-
-// Define the MyComponent props interface
-interface MyComponentProps {
-    html: string;
-    keywords: Keyword[];
-}
-
-
-const inlineKeysClassNames = `tap-highlight-transparent outline-none data-[focus-visible=true]:z-10 data-[focus-visible=true]:outline-2 data-[focus-visible=true]:outline-focus data-[focus-visible=true]:outline-offset-2 no-underline hover:opacity-80 active:opacity-disabled transition-opacity relative max-w-fit min-w-min inline-flex items-center justify-between box-border whitespace-nowrap text-small rounded-full bg-default/40 text-default-foreground mt-1 capitalize px-2 pt-0.5 pb-0.5 h-fit`;
-
-const MyComponent: FC<MyComponentProps> = ({html, keywords}) => {
-    // This function converts a keyword object to a URL string
-    const keywordToUrl = (keyword: Keyword) => `/explore/search?${keyword.type}=${encodeURIComponent(keyword.value)}`;
-
-    // The replace function for html-react-parser
-    let matches: string[] = [];
-    const replaceFn = (domNode: any) => {
-        if (domNode.type === 'text') {
-            let text = domNode.data;
-            keywords.forEach(keyword => {
-                const regex = new RegExp(keyword.value, 'gi');
-                text = text.replace(regex, (matched: string) => {
-                    if (matches.indexOf(matched) === -1) {
-                        return renderToString(
-                            <Link href={keywordToUrl(keyword)}
-                                  className={inlineKeysClassNames}
-                            >{matched}</Link>
-                        )
-                    }
-                    matches.push(matched);
-                });
-            });
-
-            // Return a span with the replaced text (HTML) as dangerouslySetInnerHTML
-            return <span dangerouslySetInnerHTML={{__html: text}}/>;
-        }
-    };
-
-    // Parse the HTML string with the replace function
-    return parse(html, {replace: replaceFn})
-};
-
-
-
-const UnbodyTextBlock = ({data, keywords}: {data: ITextBlock, keywords: Keyword[]}) => {
+const UnbodyTextBlock = ({data, keywords}: {data: ITextBlock, keywords: TagProps[]}) => {
     switch (data.tagName) {
         case "h1":
             return <h1>{data.text as string}</h1>
@@ -79,7 +32,7 @@ const UnbodyTextBlock = ({data, keywords}: {data: ITextBlock, keywords: Keyword[
         case "h6":
             return <h6>{data.text as string}</h6>
         case "p":
-            return <MyComponent html={data.html as string} keywords={keywords}/>
+            return <ParagraphBlock html={data.html as string} keywords={keywords}/>
         case "ul":
             return <ul dangerouslySetInnerHTML={{__html: data.html as string}}/>
 
@@ -87,9 +40,9 @@ const UnbodyTextBlock = ({data, keywords}: {data: ITextBlock, keywords: Keyword[
 }
 
 
-const isTitle = (block: ITextBlock | IImageBlock) => {
+const isTitle = (block: TextBlock) => {
     // @ts-ignore
-    return ((block as ITextBlock).classNames || []).includes("title");
+    return (block.classNames || []).includes("title");
 }
 
 const isPreviewImage = (block: ITextBlock | IImageBlock) => {
@@ -124,23 +77,18 @@ const PreviewImage = ({data, height = 500}: PreviewImageProps) => {
     )
 }
 
-
-
-
 export const GDocPost = ({data}: Props) => {
-
     const keywords = useMemo(() => {
         return uniqueBy([
-            ...(data.autoKeywords as string[] || []).map((keyword) => ({value: keyword, type: "keyword"})),
-            ...(data.autoEntities as string[] || []).map((entity) => ({value: entity, type: "entity"})),
-            ...(data.autoTopics as string[] || []).map((topic) => ({value: topic, type: "topic"}))
-        ], 'value')
+            ...(data.autoKeywords as string[] || []).map((keyword) => ({key: keyword, type: "keyword"})),
+            ...(data.autoEntities as string[] || []).map((entity) => ({key: entity, type: "entity"})),
+            ...(data.autoTopics as string[] || []).map((topic) => ({key: topic, type: "topic"}))
+        ], 'key')
     }, [data]);
 
     const previewImage = useMemo(() => {
         return (data.blocks as (ITextBlock | IImageBlock)[]).find(isPreviewImage) as ImageBlock
     }, [data.blocks]);
-
 
     return (
         <div className={"flex flex-col items-center"}>
@@ -170,14 +118,14 @@ export const GDocPost = ({data}: Props) => {
 
             <article className={"prose mt-4 prose-img:rounded-xl prose-a:text-blue-600 max-w-screen-md"}>
                 {
-                    // @ts-ignore
                     (data.blocks)!
-                        // @ts-ignore
                         .sort((a, b) => a.order - b.order)
-                        // @ts-ignore
                         .filter(b => (
-                            !isPreviewImage(b)
-                            && !isTitle(b)
+                            !isPreviewImage(b as unknown as ImageBlock)
+                            && (
+                                b.__typename === SupportedContentTypes.TextBlock
+                                && !isTitle(b as unknown as TextBlock)
+                            )
                         ))
                         // @ts-ignore
                         .map((block, index) => {

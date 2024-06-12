@@ -1,12 +1,14 @@
 import {Category} from "@/types/data.types";
-import {Card, CardFooter, CardHeader, Progress} from "@nextui-org/react";
+import {Card, CardFooter, CardHeader} from "@nextui-org/react";
 import clsx from "clsx";
 import {Button} from "@nextui-org/button";
-import React, {PropsWithChildren} from "react";
+import React, {PropsWithChildren, useMemo} from "react";
 import {Article_CARD_HEIGHT} from "@/config/ui.config";
-import {articleCardBaseClasses} from "@/components/ArticleCard";
 import {LineSkeleton} from "@/components/skeletons";
 import {LoadingIcon} from "@/components/icons";
+import {SupportedContentTypes} from "@/types/plugins.types";
+import {convertPostTypeToLabel} from "@/utils/copy.utils";
+import {articleCardBaseClasses} from "@/components/defaults/Defaults.Card";
 
 type HeadCardProps = {
     data: Category
@@ -65,7 +67,7 @@ const useCatHeadAnimations = (index: number, delay: number): UseCatHeadAnimation
             }, delay);
             setTimeout(() => {
                 setState(prev => ({...prev, showStatus: true}))
-            }, 500*(index+1) + delay);
+            }, 500 * (index + 1) + delay);
         }
     }, [index]);
 
@@ -77,8 +79,22 @@ const NumbersSkeleton = () => (
 )
 
 export const CategoryHeadCard = (props: HeadCardProps) => {
-    const {data: {title, summary, articles, blocks}, onClick, open, index, delay} = props;
+    const {
+        data: {title, summary},
+        onClick,
+        open,
+        index,
+        delay
+    } = props;
+
     const {showText, showStatus} = useCatHeadAnimations(index, delay);
+
+    const counts: Record<SupportedContentTypes, number> = useMemo(() => {
+        return props.data.items.reduce((acc, item) => {
+            acc[item.__typename] = (acc[item.__typename] || 0) + 1;
+            return acc;
+        }, {} as Record<SupportedContentTypes, number>)
+    }, [props.data.items]);
 
     return (
         <Card className={clsx([
@@ -94,27 +110,25 @@ export const CategoryHeadCard = (props: HeadCardProps) => {
         >
             <CardHeader className="flex-col items-start mb-0 pb-0" onClick={onClick}>
                 <Status>
-                    <div className={"flex flex-row gap-1 justify-center items-center"}>
-                        <span>
-                            {
-                                showStatus?articles.length:<NumbersSkeleton/>
-                            }
-                        </span>
-                        <span className={"text-gray-500"}> Articles</span>
-                    </div>
-                    <div className={"mr-1"}>,</div>
-                    <div className={"flex flex-row gap-1 justify-center items-center"}>
-                        <span>
-                            {
-                                showStatus?blocks.length:<NumbersSkeleton/>
-                            }
-                        </span>
-                        <span className={"text-gray-500"}> Blocks</span>
-                    </div>
+                    {
+                        Object.keys(counts).map((key, i) => (
+                            <div key={i} className={"flex flex-row gap-1 justify-center items-center"}>
+                            <span className={"text-gray-500"}>
+                                {counts[key as SupportedContentTypes]} {convertPostTypeToLabel(key as SupportedContentTypes)}
+                            </span>
+                                {
+                                    i < Object.keys(counts).length-1 && (
+                                        <span
+                                            className={"text-medium text-gray-500 mr-1 inline-block -translate-y-1"}>.</span>
+                                    )
+                                }
+                            </div>
+                        ))
+                    }
                 </Status>
                 {
                     showText ?
-                            <span className={"text-large capitalize animate-fadeIn"}>
+                        <span className={"text-large capitalize animate-fadeIn"}>
                                 {title}
                             </span>
                         :

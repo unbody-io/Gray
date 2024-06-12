@@ -5,11 +5,14 @@ import React from "react";
 
 export default function Document() {
     return (
-        <Html lang="en" suppressHydrationWarning>
+        <Html lang="en"
+              suppressHydrationWarning
+              className={"bg-gray-100"}
+        >
             <Head />
             <body
                 className={clsx(
-                    "bg-gray-100 font-sans antialiased",
+                    "font-sans antialiased",
                     // "bg-gradient-to-tr from-gray-300 to-gray-50",
                     fontSans.variable
                 )}

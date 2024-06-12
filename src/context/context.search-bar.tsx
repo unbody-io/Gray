@@ -1,41 +1,61 @@
 import React, {createContext, useEffect} from "react";
 import {useRouter} from "next/router";
-import {QueryContextKey} from "@/types/data.types";
-import {ESearchMode} from "@/types/ui.types";
+import {ESearchMode, ESearchScope} from "@/types/ui.types";
 
 type SearchBarState = {
     query?: string;
-    topics?: string;
-    entities?: string;
-    keywords?: string;
+    filters?: string;
+
     mode: ESearchMode;
 
-    setQueryState: (query: string|undefined) => void;
-    setFilters: (type: QueryContextKey, value: string) => void;
+    scope: ESearchScope;
+    setScope: (scope: ESearchScope) => void;
+    scopeLabel: string|null;
+    setScopeLabel: (label: string) => void;
+
+    setQuery: (query: string|undefined) => void;
+    setFilters: (value: string) => void;
+
+    pushQuery: (query: string|undefined) => void;
+    pushFilters: (filters: string|undefined) => void;
+
     setMode: (mode: ESearchMode) => void;
     clearQuery: () => void;
+
+    isFocused: boolean;
+    setFocused: (value: boolean) => void;
 }
 
 const initialState: SearchBarState = {
     query: undefined,
-    topics: undefined,
-    entities: undefined,
-    keywords: undefined,
-    setQueryState: () => {},
+    filters: undefined,
+    setQuery: () => {},
     setFilters: () => {},
     clearQuery: () => {},
     setMode: () => {},
-    mode: ESearchMode.Search
+    mode: ESearchMode.Search,
+    scope: ESearchScope.global,
+    setScope: () => {},
+    scopeLabel: null,
+    setScopeLabel: () => {},
+
+    pushFilters: () => {},
+    pushQuery: () => {},
+
+    isFocused: false,
+    setFocused: () => {},
+
 }
 
 const SearchBarContext = createContext(initialState)
 
 export const SearchBarProvider = ({children}: {children: React.ReactNode}) => {
     const [query, setQuery] = React.useState<string|undefined>(undefined);
-    const [topics, setTopic] = React.useState<string|undefined>(undefined);
-    const [entities, setEntity] = React.useState<string|undefined>(undefined);
-    const [keywords, setKeyword] = React.useState<string|undefined>(undefined);
+    const [filters, setFilters] = React.useState<string|undefined>(undefined);
     const [mode, setMode] = React.useState<ESearchMode>(ESearchMode.Search);
+    const [scope, setScope] = React.useState<ESearchScope>(ESearchScope.global);
+    const [scopeLabel, setScopeLabel] = React.useState<string|null>(null);
+    const [isFocused, setFocused] = React.useState<boolean>(false);
 
     const router = useRouter();
 
@@ -44,11 +64,17 @@ export const SearchBarProvider = ({children}: {children: React.ReactNode}) => {
     }
 
     useEffect(() => {
-        setQuery(router.query.query as string);
-        setTopic(isValidFilter(router.query.topics as string) ? router.query.topics as string : undefined);
-        setEntity(isValidFilter(router.query.entities as string) ? router.query.entities as string : undefined);
-        setKeyword(isValidFilter(router.query.keywords as string) ? router.query.keywords as string : undefined);
-    }, [router.query.query, router.query.topics, router.query.entities, router.query.keywords]);
+        const {query = undefined, filters = undefined} = router.query;
+        if (query){
+            setQuery(query as string);
+        }
+        if (filters){
+            _setFilters(filters as string);
+        }
+    }, [
+        router.query.query,
+        router.query.filters
+    ]);
 
     useEffect(() => {
         if(router.pathname.includes("/read")){
@@ -56,7 +82,14 @@ export const SearchBarProvider = ({children}: {children: React.ReactNode}) => {
         }else if(router.pathname.includes("/explore")){
             setMode(ESearchMode.Search)
         }
-        // setMode(router.pathname.split("/")[2] as ESearchMode)
+
+        if(router.pathname.startsWith("/posts")){
+            const scope = router.pathname.split("/")[2] as ESearchScope;
+            setScope(scope);
+        }else{
+            setScope(ESearchScope.global);
+        }
+
     }, [router.pathname]);
 
     const setModeState = (mode: ESearchMode) => {
@@ -71,10 +104,13 @@ export const SearchBarProvider = ({children}: {children: React.ReactNode}) => {
         )
     }
 
-    const setQueryState = (query: string|undefined) => {
+    const pushQuery = (query: string|undefined) => {
+        if(scope !== ESearchScope.global){
+            return
+        }
         router.push(
             {
-                pathname: router.pathname,
+                pathname: "/explore/search",
                 query: {
                     ...router.query,
                     ...(query !== undefined ? {query} : undefined)
@@ -85,36 +121,45 @@ export const SearchBarProvider = ({children}: {children: React.ReactNode}) => {
         )
     }
 
-    const setFilters = (type: QueryContextKey, value: string) => {
-        const current = router.query[type] as string;
-        console.log(current, value)
-        const newValue = (current as string).split(",").filter((v) => v !== value).join(",");
-        let newQuery = {...router.query};
 
-        if (newValue.trim().length > 0) {
-            newQuery[type] = newValue;
-        } else {
-            delete newQuery[type];
+    const pushFilters = (filters: string|undefined) => {
+        if(scope !== ESearchScope.global){
+            return
         }
-
+        console.log("filters", filters)
         router.push(
             {
-                pathname: router.pathname,
-                query: newQuery
+                pathname: "/explore/search",
+                query: {
+                    query,
+                    ...(filters?.length ? {filters} : {})
+                }
             },
             undefined,
-            {shallow: false}
+            // {shallow: false}
         )
+    }
+
+
+    const _setFilters = (newValue: string) => {
+        // const current = router.query.filters;
+        // let newState = current && typeof current === "string" ? current.split(",") : [];
+
+        let newState = newValue.split(",");
+
+        if (newState.length === 0){
+            pushFilters(undefined);
+            return;
+        }
+
+        setFilters(newState.join(","));
     }
 
     const clearQuery = () => {
         router.push(
             {
                 pathname: router.pathname,
-                query: {
-                    ...router.query,
-                    query: undefined,
-                },
+                query: {},
             },
             undefined,
             {shallow: false}
@@ -125,14 +170,20 @@ export const SearchBarProvider = ({children}: {children: React.ReactNode}) => {
         <SearchBarContext.Provider
             value={{
                 query,
-                topics,
-                entities,
-                keywords,
-                setQueryState,
-                setFilters,
+                filters,
+                pushQuery,
+                pushFilters,
+                setQuery,
+                setFilters: _setFilters,
                 clearQuery,
                 setMode: setModeState,
-                mode
+                mode,
+                scope,
+                setScope,
+                scopeLabel,
+                setScopeLabel,
+                isFocused,
+                setFocused
             }}
         >
             {children}

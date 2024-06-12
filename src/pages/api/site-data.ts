@@ -6,7 +6,6 @@ export default async function handler(
     req: NextApiRequest,
     res: NextApiResponse<IGoogleDoc|null>
 ) {
-    console.log("req")
     return res.status(200).json(
         await readFile("public/data/site-data.json", "utf-8").then((data) => JSON.parse(data))
     );
