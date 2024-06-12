@@ -5,7 +5,6 @@ export const formatDate = (date: string) => {
 }
 
 
-// Helper function to convert time in "HH:MM:SS.sss" format to seconds
 export function timeToSeconds(time: string): number {
     const [h, m, s] = time.split(':');
     const [sec, ms] = s.split('.');
