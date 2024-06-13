@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "build-sitedata": "TS_NODE_PROJECT=tsconfig.server.json node -r ts-node/register -r dotenv/config -r tsconfig-paths/register src/prebuild-data/generator.ts"
+    "prebuild": "TS_NODE_PROJECT=tsconfig.server.json node -r ts-node/register -r dotenv/config -r tsconfig-paths/register src/prebuild-data/generator.ts"
   },
   "dependencies": {
     "@mux/mux-player": "^2.7.0",

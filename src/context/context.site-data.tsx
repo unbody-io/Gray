@@ -45,7 +45,7 @@ export type ContextSiteDataState = Omit<SiteData, "context"> & {
 };
 
 const initialState = transformInitialState(
-    initialStateNoType as SiteData
+    initialStateNoType
 );
 
 const attachUiComponentsState = (state: ContextSiteDataState): ContextSiteDataState => {

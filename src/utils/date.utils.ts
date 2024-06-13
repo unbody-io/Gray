@@ -4,7 +4,6 @@ export const formatDate = (date: string) => {
     return d.toLocaleDateString('en-US', {year: 'numeric', month: 'short', day: 'numeric'})
 }
 
-
 export function timeToSeconds(time: string): number {
     const [h, m, s] = time.split(':');
     const [sec, ms] = s.split('.');

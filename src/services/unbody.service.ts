@@ -29,6 +29,7 @@ import {ApiTypes} from "@/types/api.type";
 import {NexlogConfigAll} from "@/types/nexlog.types";
 import {StructuredUserInput, UserInputType} from "@/types/prompt.types";
 import * as unbodyUtils from "@/services/unbody.utils";
+import {QueryBuilder} from "@unbody-io/ts-client/build/core/query-builder";
 
 if (!process.env.UNBODY_API_KEY || !process.env.UNBODY_PROJECT_ID) {
     throw new Error("UNBODY_API_KEY and UNBODY_PROJECT_ID must be set");
@@ -672,7 +673,28 @@ const searchSummaryVideo = async ({input, siteConfigs, siteData, filters}: {
         ? input.subject_topic.split(",")
         : input.subject_topic;
 
-    prompt += `Here are the relevant search results for the following keywords:\n`;
+
+    let query = unbody.get
+        .subtitleEntry
+        .where({
+            document: {
+                SubtitleFile: {
+                    media: {
+                        VideoFile: {
+                            [idKey]: filters[0]
+                        }
+                    }
+                }
+            }
+        })
+        .limit(100);
+
+    if(input.requires_search) {
+        // @ts-ignore
+        query = query.search.about(input.concepts_key_terms.join(", "))
+    }
+
+    prompt += `These are a set of subtitles from a video which are related to following keywords:\n`;
     prompt += input.concepts_key_terms.join(", ") + ".\n";
     prompt += `Your task is to: \n`
 
@@ -697,22 +719,7 @@ const searchSummaryVideo = async ({input, siteConfigs, siteData, filters}: {
 
     // prompt += `**additional information about entire ${siteData.context.siteType}**:\n${siteData.context.contentSummary}`;
 
-    const {data: {generate, payload}} = await unbody.get
-        .subtitleEntry
-        .where({
-            document: {
-                SubtitleFile: {
-                    media: {
-                        VideoFile: {
-                            [idKey]: filters[0]
-                        }
-                    }
-                }
-            }
-        })
-        .limit(100)
-        .search
-        .about(input.subject_topic)
+    const {data: {generate, payload}} = await query
         .generate
         .fromMany(prompt, ["text", "start", "end"])
         .exec();

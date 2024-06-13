@@ -8,12 +8,9 @@ import clsx from "clsx";
 
 import {DefaultVideoPlayer} from "@/components/defaults/Defaults.VideoPlayer";
 import {chunkEntriesSentenceAware} from "@/utils/data.utils";
-import {secondsToMinutes} from "@/utils/ui.utils";
-import {ReactRef} from "@nextui-org/react-utils";
 import {VideoLiveCaption, VideoLiveCaptionChunk} from "@/components/defaults/Defaults.VideoPlayer.Captions";
-import {Link} from "@nextui-org/link";
-import {Divider, Modal, ModalBody, ModalContent, Progress} from "@nextui-org/react";
-import {DefaultsTag} from "@/components/defaults/content-blocks/Defaults.Tag";
+import {Progress} from "@nextui-org/react";
+
 import {useSearchBar} from "@/context/context.search-bar";
 import {DefaultsVideoPostHeader} from "@/components/defaults/Defaults.VideoPost.Header";
 import {DefaultVideoPlayerMini} from "@/components/defaults/Defaults.VideoPlayer.Mini";
@@ -29,11 +26,12 @@ type PostPageProps = {
 }
 
 const PostPage = ({data}: PostPageProps) => {
-    const {setScopeLabel, query, isFocused} = useSearchBar();
+    const {setScopeLabel, query, isFocused, setQuery} = useSearchBar();
     const {configs: {plugins}, context} = useSiteData();
 
-    const id = plugins.find((plugin) => plugin.type === SupportedContentTypes.VideoFile)?.identifier as string;
+    const isInSearchMode = isFocused||(query && query.length>0);
 
+    const id = plugins.find((plugin) => plugin.type === SupportedContentTypes.VideoFile)?.identifier as string;
 
     const playerRef = React.useRef<HTMLDivElement>(null);
     const [now, setNow] = React.useState<number>(0);
@@ -74,16 +72,18 @@ const PostPage = ({data}: PostPageProps) => {
         }
     }, [structuredInput.data]);
 
+    useEffect(() => {
+        if (query&&query.length>0) {
+            setQuery(undefined);
+        }
+    }, [isFocused])
+
     return (
         <DefaultLayout containerMaxWidth={`max-w-screen-md relative`}>
             {
-                (isFocused || query) && (
-                    <DefaultVideoPlayerMini videoFile={data as EnhancedVideoFile}/>
-                )
-            }
-            {
-                (isFocused || (query&&query.length>0)) && (
+                isInSearchMode && (
                     <>
+                        <DefaultVideoPlayerMini videoFile={data as EnhancedVideoFile}/>
                         <div className={"pt-4"}>
                             {
                                 (summary.isLoading || structuredInput.isLoading) ?
