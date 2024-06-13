@@ -21,7 +21,7 @@ export const highlightTags = ({text, tags, active = false}: TextWithBadgesProps)
         if (index % 2 !== 0) {
             const item = getItem(part);
             if (item) {
-                return `<a class="chip chip-${item?.type} ${active?'chip-active':''}" href="/explpre/search?filters=${item.key}"><span class="chip-content">${part}</span></a>`
+                return `<a class="chip no-underline chip-${item?.type} ${active?'chip-active':''}" href="/explore/search?filters=${item.key}"><span class="chip-content">${part}</span></a>`
             }
             return part
         }

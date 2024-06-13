@@ -38,7 +38,7 @@ export default function Page(props: InferGetStaticPropsType<typeof getStaticProp
                 <SectionTitle>
                     Directories
                 </SectionTitle>
-                <DirectoryList data={directories} />
+                <DirectoryList data={[...directories, ...directories, ...directories, ...directories]} />
             </section>
             <section>
                 <SectionTitle>

@@ -10,7 +10,8 @@ export const DirectoryList = ({data: directories}: Props) => {
 
     const maskWidth = 100;
     const gap = `1rem`;
-    const cols = 4;
+    const cols = 3;
+    const maxContainerW = 768 + maskWidth;
 
     const commonClasses = [
         `px-[${maskWidth}px]`,
@@ -41,38 +42,53 @@ export const DirectoryList = ({data: directories}: Props) => {
             'py-2'
         )}
              style={{
+                 // width: "100%",
                     width: `calc(100% + ${maskWidth * 2}px)`,
-                    marginLeft: `-${maskWidth}px`,
+                    transform: `translateX(${-1*maskWidth}px)`,
+                 //    marginLeft: `-${maskWidth}px`,
+                 //    paddingLeft: `${maskWidth}px`,
+                 // background: "yellow"
+                    // paddingRight: `${maskWidth}px`,
              }}
         >
             <div className={clsx(...gardenClassesL)}
                  style={{
                      width: `${maskWidth*2}px`,
-                        left: `-${maskWidth*0.1}px`,
+                     // opacity: "0.1"
+                     // background: "red"
+                     // left: `-${maskWidth*0.1}px`,
                 }}
             />
             <div className={clsx(...gardenClassesR)}
                  style={{width: `${maskWidth * 2}px`}}
             />
+
             <div className={clsx(
                 ...commonClasses,
                 'pb-24 pt-6',
                 'overflow-x-scroll',
                 'overflow-y-hidden',
-                'flex'
+                // 'flex',
             )}>
-                <div className={`flex gap-4 z-1`}
+                <div className={`grid grid-cols-4 z-1`}
                      style={{
                          gap,
-                         width: `calc(10px + calc(${directories.length * 100}% / ${cols}))`,
+                         width: `${Math.max(directories.length, cols+1) * (maxContainerW/cols)}px`,
+                         // width: `70vw`,
+                         // minWidth: "100%",
+                         // width: `calc(10px + calc(${directories.length * 100}% / ${directories.length}))`,
                          paddingLeft: `${maskWidth}px`,
+                         paddingRight: `${maskWidth}px`,
+                         // background: "red"
                     }}
                 >
                     {
                         directories.map((directory, i) => (
                             <div key={i}
-                                 className="flex-shrink-0"
-                                 style={{ width: `calc(100% / ${cols})` }}
+                                 style={{
+                                     // width: `calc(100% / ${directories.length})`,
+                                     // flexBasis: `calc(100% / ${directories.length})`,
+                                }}
                             >
                                 <DirectoryCard data={directory}/>
                             </div>

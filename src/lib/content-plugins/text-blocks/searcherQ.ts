@@ -57,6 +57,7 @@ const searcherQ: SearcherQueryFn = (props) => {
             )
         })
 
+
     if (requiresSearch){
         const searchQ = input.subject_topic.length > 0 ? input.subject_topic : input.concepts_key_terms;
         const q = [
@@ -65,6 +66,8 @@ const searcherQ: SearcherQueryFn = (props) => {
         ].join(",");
 
         query = query.search.about(q, {certainty: 0.65}) as GetQueryBuilder<any>;
+    }else if (filters.length > 0){
+        query = query.search.about(filters, {certainty: 0.65}) as GetQueryBuilder<any>;
     }
 
     if (!isSearchOnly || forceGenerate) {
