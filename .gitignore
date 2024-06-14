@@ -34,5 +34,5 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-public/data/*
-public/data/**/*
+public/data/*.json
+public/data/**/*.json
