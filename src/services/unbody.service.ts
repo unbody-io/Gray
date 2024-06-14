@@ -147,7 +147,6 @@ const buildSiteContext = async (
             return {};
         });
 
-
     let context: SiteContext = {
         siteType: essentials.siteType || defaultContext.siteType || SiteType.BLOG,
         title: essentials.title || defaultContext.title || "Nexlog",
@@ -224,7 +223,6 @@ const createDirectories = async (
             if (!post.pathString) return false;
             return (post.pathString as string).startsWith(`/${directory}/`);
         });
-
 
         let prompt = "You are going to help me define and extract some information from the given document.\n";
         prompt += `This is a content that represent one single directory in a website, where all directories are related to eachother, the context and content of each can be different.`;
