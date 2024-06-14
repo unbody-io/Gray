@@ -7,14 +7,14 @@ import {POSTS_DATA_FOLDER_PATH} from "@/prebuild-data/configs";
 
 import {PostRef, SiteData} from "@/types/data.types";
 import {StructuredUserInput} from "@/types/prompt.types";
-import {NexlogConfigAll} from "@/types/nexlog.types";
+import {GrayConfigAll} from "@/types/gray.types";
 
 
 const fields: any[] = [];
 export type Fields = typeof fields[number];
 
 export type SearchFnProps = {
-    siteConfig: NexlogConfigAll,
+    siteConfig: GrayConfigAll,
     siteData: SiteData;
     input: StructuredUserInput;
     filters?: string[];
@@ -218,10 +218,10 @@ export default class ContentHandler<RD extends {}, ED extends {}> {
                     );
 
                     // if existing post is found, and it is same as new post, then skip
-                    if (existingPost && this.comparator(existingPost, newPost)) {
-                        console.log(`Skipping enhancing ${this.type}: ${newPost[identifier]}`);
-                        return existingPost;
-                    }
+                    // if (existingPost && this.comparator(existingPost, newPost)) {
+                    //     console.log(`Skipping enhancing ${this.type}: ${newPost[identifier]}`);
+                    //     return existingPost;
+                    // }
 
                     return await this.enhancer(newPost).catch(e => {
                         console.error(`Error enhancing ${this.type}`);

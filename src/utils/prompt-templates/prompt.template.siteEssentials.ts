@@ -18,6 +18,7 @@ const instructions: Record<RequiredKeys, any> = {
     seoKeywords: "A list of SEO friendly keywords separated by commas",
     siteType: `One of these values: ${getEnumValues(SiteType).join(", ")}`,
     title: "The title of the site",
+    querySuggestions: "A list of suggestions for user queries based on the content of the site"
 }
 
 const examples: SiteContextConfig = {
@@ -25,7 +26,13 @@ const examples: SiteContextConfig = {
     seoDescription: "A site about the latest tech news",
     seoKeywords: ["tech", "news", "latest"],
     siteType: SiteType.BLOG,
-    title: "Tech News"
+    title: "Tech News",
+    querySuggestions: [
+        "Compare the talks given by ...",
+        "Posts about...",
+        "How to ...",
+        "Summarize ...",
+    ]
 }
 
 const types: Record<RequiredKeys, string> = {
@@ -33,7 +40,8 @@ const types: Record<RequiredKeys, string> = {
     seoDescription: `string`,
     seoKeywords: `string[]`,
     siteType: `${getEnumValues(SiteType).join("|")}`,
-    title: "string"
+    title: "string",
+    querySuggestions: `string[]`
 }
 
 export const siteEssentialsPrompt: PromptTemplate<StructuredUserInput> = {

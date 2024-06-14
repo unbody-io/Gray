@@ -1,5 +1,5 @@
 import {SupportedContentTypes} from "@/types/plugins.types";
-import {NexlogContentPluginComponentsList} from "@/context/context.site-data";
+import {GrayContentPluginComponentsList} from "@/context/context.site-data";
 import DefaultsVideoCard from "@/components/defaults/Defaults.VideoCard";
 import DefaultsArticleCard from "@/components/defaults/Defaults.ArticleCard";
 import {DefaultTextBlockCard} from "@/components/defaults/Defaults.BlockCard.TextBlock";
@@ -9,7 +9,7 @@ import DefaultSearchResultsListArticle from "@/components/defaults/Defaults.Sear
 import DefaultSearchResultsListBlocks from "@/components/defaults/Defaults.SearchResults.List.Blocks";
 import DefaultsArticleCardWithRefs from "@/components/defaults/Defaults.ArticleCardWithRefs";
 
-export const defaultNexlogComponents: NexlogContentPluginComponentsList = {
+export const defaultGrayComponents: GrayContentPluginComponentsList = {
     [SupportedContentTypes.VideoFile]: {
         list: DefaultSearchResultsListVideos,
         card: DefaultsVideoCard,

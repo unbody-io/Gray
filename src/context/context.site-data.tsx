@@ -3,31 +3,31 @@ import React, {ComponentType, createContext, ReactNode, useContext, useEffect, u
 
 import initialStateNoType from "../../public/data/site-data.json"
 import {SupportedContentTypes} from "@/types/plugins.types";
-import {defaultNexlogComponents} from "@/config/defaults.ui.configs";
+import {defaultGrayComponents} from "@/config/defaults.ui.configs";
 import {loadPluginComponents, transformInitialState} from "@/lib/content-plugins/utils";
 
-export enum NexlogContentPluginComponentsKeys {
+export enum GrayContentPluginComponentsKeys {
     list = "list",
     card = "card",
     card_with_refs = "card_with_refs"
 }
 
-export type NexlogContentPluginComponents = {
-    [key in NexlogContentPluginComponentsKeys]?: ComponentType<any> | null
+export type GrayContentPluginComponents = {
+    [key in GrayContentPluginComponentsKeys]?: ComponentType<any> | null
 }
 
-export type NexlogContentPluginComponentsList = {
-    [key in SupportedContentTypes]: NexlogContentPluginComponents
+export type GrayContentPluginComponentsList = {
+    [key in SupportedContentTypes]: GrayContentPluginComponents
 }
 
-const nexlogComponentsKeys = Object.keys(NexlogContentPluginComponentsKeys).map(k => k.toLowerCase()) as NexlogContentPluginComponentsKeys[];
+const grayComponentsKeys = Object.keys(GrayContentPluginComponentsKeys).map(k => k.toLowerCase()) as GrayContentPluginComponentsKeys[];
 
 type CustomUiComponentState = {
     component: ComponentType<any> | null,
     loading: boolean
 }
 
-export type NexlogCustomComponents = {
+export type GrayCustomComponents = {
     [key in SupportedContentTypes]: {
         list: CustomUiComponentState
         card: CustomUiComponentState
@@ -40,7 +40,7 @@ export type ContextSiteDataState = Omit<SiteData, "context"> & {
         siteType: SiteType,
     }
     components: {
-        perContentType: NexlogCustomComponents
+        perContentType: GrayCustomComponents
     };
 };
 
@@ -58,10 +58,10 @@ const attachUiComponentsState = (state: ContextSiteDataState): ContextSiteDataSt
             // @ts-ignore
             acc[contentType] = {};
 
-            for (const key of nexlogComponentsKeys) {
+            for (const key of grayComponentsKeys) {
                 const component = plugin?.uiComponents?.[key];
-                acc[contentType][key.toLowerCase() as NexlogContentPluginComponentsKeys] = {
-                    component: defaultNexlogComponents[contentType][key] || null,
+                acc[contentType][key.toLowerCase() as GrayContentPluginComponentsKeys] = {
+                    component: defaultGrayComponents[contentType][key] || null,
                     loading: component != null
                 };
             }
@@ -99,7 +99,7 @@ export const SiteDataProvider = ({children}: { children: ReactNode }) => {
 
             for (const cc of customComponents) {
                 if (!cc) continue;
-                for (const key of nexlogComponentsKeys) {
+                for (const key of grayComponentsKeys) {
                     const component = cc.components[key];
                     if (component) {
                         console.log("Setting component", cc.type, key, component, state)

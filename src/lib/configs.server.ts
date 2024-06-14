@@ -1,4 +1,4 @@
-import {NexlogConfigAll} from "@/types/nexlog.types";
+import {GrayConfigAll} from "@/types/gray.types";
 import {SiteData} from "@/types/data.types";
 import {readSiteData} from "@/services/data.service";
 import {getConfigs} from "@/lib/configs.common";
@@ -6,7 +6,7 @@ import {getConfigs} from "@/lib/configs.common";
 let siteData: SiteData;
 
 export const getConfigsWithSiteData = async (): Promise<{
-        configs: NexlogConfigAll,
+        configs: GrayConfigAll,
         siteData: SiteData
 }> => {
     const configs = getConfigs();

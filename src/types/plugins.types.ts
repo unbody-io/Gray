@@ -1,6 +1,6 @@
 import {SiteData} from "@/types/data.types";
 import {StructuredUserInput} from "@/types/prompt.types";
-import {NexlogConfigAll} from "@/types/nexlog.types";
+import {GrayConfigAll} from "@/types/gray.types";
 import React from "react";
 import {UiComponents} from "@/lib/content-plugins/handler.class";
 
@@ -20,7 +20,7 @@ export type InitialPostsData<ED> = {
 }
 
 export type PromptHandlerFn = {
-    create: (configs: NexlogConfigAll, siteData: SiteData, userInput: StructuredUserInput) => string;
+    create: (configs: GrayConfigAll, siteData: SiteData, userInput: StructuredUserInput) => string;
     parse: (output: string) => string|null;
 };
 

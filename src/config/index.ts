@@ -1,1 +1,1 @@
-export {default as nexLogDefaultConfigs} from "./defaults.config";
+export {default as grayDefaultConfigs} from "./defaults.config";

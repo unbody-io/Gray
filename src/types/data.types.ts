@@ -8,7 +8,7 @@ import {
 import {id} from "postcss-selector-parser";
 import {TextBlock} from "@unbody-io/ts-client/build/types/TextBlock.types";
 import {SupportedContentTypes} from "@/types/plugins.types";
-import {NextLogConfigData} from "@/types/nexlog.types";
+import {NextLogConfigData} from "@/types/gray.types";
 
 export type NameEntity = {
     entity: string
@@ -144,6 +144,7 @@ export type ImageBlock = {
 
 
 export type SiteData = {
+    icon: string,
     context: SiteContext
     categories: Category[]
     directories: Directory[]
@@ -187,6 +188,8 @@ export type SiteContext = {
     siteType: SiteType.BLOG | SiteType.JOURNAL | SiteType.OUTLET | SiteType.PODCAST | SiteType.PORTFOLIO;
 
     contributors: string[];
+
+    querySuggestions: string[]
 }
 
 export type SiteContextConfig = {
@@ -205,6 +208,8 @@ export type SiteContextConfig = {
     siteType?: SiteType.BLOG | SiteType.JOURNAL | SiteType.OUTLET | SiteType.PODCAST | SiteType.PORTFOLIO;
 
     contributors?: string[];
+
+    querySuggestions?: string[]
 }
 
 

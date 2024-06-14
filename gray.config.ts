@@ -1,4 +1,4 @@
-import {NextlogConfig} from "@/types/nexlog.types";
+import {NextlogConfig} from "@/types/gray.types";
 import {ContentHandler} from "@/lib/content-plugins";
 import {defaultVideoFileHandlerOptions} from "@/lib/content-plugins/video-files";
 import {videoComparator, videoEnhancer} from "@/lib/ai-thinkerers/content";

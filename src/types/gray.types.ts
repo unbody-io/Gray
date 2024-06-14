@@ -4,7 +4,7 @@ import {SearchConfig} from "@/types/plugins.types";
 import {SiteData} from "@/types/data.types";
 import {StructuredUserInput} from "@/types/prompt.types";
 
-export type NexlogConfigAll = {
+export type GrayConfigAll = {
     contentPlugins: ContentHandler<any, any>[]
     contentConfig: {
         exclude: string[],
@@ -17,7 +17,7 @@ export type NexlogConfigAll = {
     }
 }
 
-export type NextlogConfig = Partial<NexlogConfigAll>;
+export type NextlogConfig = Partial<GrayConfigAll>;
 
 export type NextLogConfigData = {
     plugins: HandlerPublicConfigs[];

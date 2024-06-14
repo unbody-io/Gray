@@ -1,4 +1,4 @@
-import {Button} from "@nextui-org/react";
+import {Autocomplete, AutocompleteItem, Button, Card, CardBody} from "@nextui-org/react";
 import {TreeIcon} from "@/components/icons";
 import React, {ChangeEventHandler, useEffect, useState} from "react";
 import {Textarea} from "@nextui-org/input";
@@ -6,6 +6,7 @@ import clsx from "clsx";
 import {useSearchBar} from "@/context/context.search-bar";
 import {DefaultsTag} from "@/components/defaults/content-blocks/Defaults.Tag";
 import {ESearchScope} from "@/types/ui.types";
+import {useSiteData} from "@/context/context.site-data";
 
 export type SearchBarProps = {
     onSearch: (prompt: string) => void;
@@ -55,6 +56,8 @@ const ControlBar = ({prompt, handleSearch, filters = []}: ControlBarProps) => (
 
 export const SearchBar = ({onSearch, onClear}: SearchBarProps) => {
     const [prompt, setPrompt] = useState<string>("");
+    const [showSuggestions, setShowSuggestions] = useState<boolean>(false);
+    const {context: {querySuggestions}} = useSiteData();
 
     const {
         clearQuery,
@@ -66,7 +69,8 @@ export const SearchBar = ({onSearch, onClear}: SearchBarProps) => {
         scopeLabel,
         pushQuery,
         pushFilters,
-        setFocused
+        setFocused,
+        isFocused,
     } = useSearchBar();
 
     const onKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -79,6 +83,12 @@ export const SearchBar = ({onSearch, onClear}: SearchBarProps) => {
     const onInputChange: ChangeEventHandler<HTMLInputElement> = (e) => {
         // here we need to recon the Enter key
         setPrompt(e.target.value);
+
+        if(e.target.value.trim().length === 0){
+            setShowSuggestions(true);
+        }else{
+            setShowSuggestions(false);
+        }
     };
 
     const handleSearch = () => {
@@ -109,6 +119,26 @@ export const SearchBar = ({onSearch, onClear}: SearchBarProps) => {
     const placeholder = scopeLabel ?
         `Chat with "${scopeLabel.slice(0, 45)}..."`
         : "Search, explore, ask or chat...";
+
+    const setSuggestion = (suggestion: string) => {
+        console.log("suggestion", suggestion)
+        setPrompt(suggestion);
+        handleSearch();
+        pushQuery(suggestion);
+    }
+
+    useEffect(() => {
+        if (isFocused&&prompt.trim().length === 0){
+            setShowSuggestions(true);
+        }
+
+        if(!isFocused){
+            setTimeout(() => {
+                setShowSuggestions(false);
+            }, 500);
+        }
+
+    }, [isFocused])
 
     return (
         <div className={"max-w-lg w-full relative flex flex-col"}>
@@ -177,6 +207,39 @@ export const SearchBar = ({onSearch, onClear}: SearchBarProps) => {
                     ))
                 }
             </div>
+            {
+                showSuggestions&&(
+                    <div className={clsx(
+                        "rounded-xl w-full overflow-hidden absolute shadow-xl",
+                    )}
+                         style={{
+                             top: "calc(100% + 0.5rem)",
+                             left: "0",
+                             right: "0",
+                         }}
+                    >
+                        <ul className={"p-4 backdrop-blur-xl flex flex-col gap-2"}>
+                            {
+                                querySuggestions.map((suggestion, index) => (
+                                    <li key={index}>
+                                        <Card className={"cursor-pointer hover:bg-gray-800 hover:text-gray-100"}>
+                                            <CardBody>
+                                        <span className={"truncate text-tiny block"}
+                                              onClick={() => {
+                                                  setSuggestion(suggestion);
+                                              }}
+                                        >
+                                            {suggestion}
+                                        </span>
+                                            </CardBody>
+                                        </Card>
+                                    </li>
+                                ))
+                            }
+                        </ul>
+                    </div>
+                )
+            }
         </div>
     );
 };

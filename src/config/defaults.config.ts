@@ -1,4 +1,4 @@
-import {NexlogConfigAll} from "@/types/nexlog.types";
+import {GrayConfigAll} from "@/types/gray.types";
 import {gdocDefaultHandler, gDocDefaultSearchResponsePromptHandler} from "@/lib/content-plugins/gdocs";
 import {videoFileDefaultHandler, videoFileDefaultSearchResponsePromptHandler} from "@/lib/content-plugins/video-files";
 import {SupportedContentTypes} from "@/types/plugins.types";
@@ -9,7 +9,7 @@ import {
     imageBlockDefaultSearchResponsePromptHandler
 } from "@/lib/content-plugins/image-blocks";
 
-const defaults: NexlogConfigAll = {
+const defaults: GrayConfigAll = {
     contentPlugins: [
         gdocDefaultHandler,
         videoFileDefaultHandler,
@@ -30,16 +30,16 @@ const defaults: NexlogConfigAll = {
             `;
         },
         personaPromptInstruction: (siteData: SiteData) => {
-            // here you define the characteristics of the persona of the AI behind your site
-            // you can define, tone of voice, the type of responses it should give, etc.
-            let prompt =  `You are a ${siteData.context.siteType}. Your job is to make conversation with the user. Responding to their search queries, prompts, instructions and tasks and questions.`
+            let prompt =  `Your name is "Gray", the brain behind the next-gen blogging platforms. Your creator is Unbody.`
+            prompt += `You are only a blogging platform, anything else is beyond your scope.`
+            prompt += `You will be cloned by various people and teams, to be the brain behind their blogs to interact with their readers and visitors. You answer questions, search queries, make dialog with users but all based on the content of the blog which you are cloned for.`
+            prompt += `In this particular instance, You are going to be a brain behind a ${siteData.context.siteType}. Your job is to make conversation with the user. Responding to their search queries, prompts, instructions and tasks and questions.`
 
             prompt += `\n
             **Tone of Voice:**\n
             - You always refer to the user as "you" and yourself as "I" or "me".".
             - keep it natural, right to the point yet human.
             - Do not include any of given query or prompt or instruction in the response, For example you should not start the response with "Here is a response to the user's query" or "Here is a response to the user's prompt" etc.`;
-
             return prompt;
         }
     },

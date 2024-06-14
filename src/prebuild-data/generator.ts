@@ -33,8 +33,6 @@ import {getConfigs} from "@/lib/configs.common";
     const contentSummary = records.map(({summary}) => summary).join("\n\n");
     const availableContent = records.map(({type}) => type);
 
-    console.log(contentSummary);
-
     const siteContext = await unbodyService.buildSiteContext(
         siteConfigs.siteData,
         contentSummary,
@@ -65,6 +63,7 @@ import {getConfigs} from "@/lib/configs.common";
 
 
     const siteData: SiteData = {
+        icon: siteConfigs.icon,
         categories: populatedCategories,
         context: siteContext,
         socials: siteConfigs.socials || [],

@@ -1,7 +1,7 @@
 import {ComponentType} from "react";
 import {HandlerPublicConfigs, UiComponents} from "@/lib/content-plugins/handler.class";
 import dynamic from "next/dynamic";
-import {ContextSiteDataState, NexlogContentPluginComponents} from "@/context/context.site-data";
+import {ContextSiteDataState, GrayContentPluginComponents} from "@/context/context.site-data";
 import {SiteType} from "@/types/data.types";
 
 export const groupBy = <T, K extends keyof any>(list: T[], getKey: (item: T) => K) =>
@@ -15,7 +15,7 @@ export const groupBy = <T, K extends keyof any>(list: T[], getKey: (item: T) => 
 
 
 export const loadPluginComponents = async (plugin: HandlerPublicConfigs)
-    : Promise<NexlogContentPluginComponents> => {
+    : Promise<GrayContentPluginComponents> => {
     const components: { [key in keyof UiComponents<string>]: ComponentType<any> | null } =
         Object.keys(plugin.uiComponents || {}).reduce((acc, key) => {
             acc[key as keyof UiComponents<string>] = null;

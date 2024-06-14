@@ -64,14 +64,16 @@ export const videoEnhancer = async (post: CDefaultVideoFile): Promise<EnhancedVi
         .limit(1)
         .exec();
     const speakersContext = speakersDoc.length > 0 ? speakersDoc[0].text : "";
-    return enhanceVideo(post, speakersContext as string);
+    const enhanced = await enhanceVideo(post, speakersContext as string)
+    console.log("Enhanced video", enhanced);
+    return enhanced;
 }
 
 
 export const videoComparator = (existingPost: EnhancedVideoFile, newPost: CDefaultVideoFile) => {
     // comparing only the fields that are not changed by the enhancer
     if (!existingPost.speaker) return false;
-    if (!existingPost.title) return false;
+    if (!existingPost.title) return false
     delete (existingPost as any).speaker;
     delete (existingPost as any).title;
     return JSON.stringify(existingPost) === JSON.stringify(newPost);

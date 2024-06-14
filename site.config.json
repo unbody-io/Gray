@@ -1,6 +1,14 @@
 {
+  "icon": "/public/img.png",
   "siteData": {
-    "title": "AI Tinkerers Blog (Amsterdam)"
+    "title": "AI Tinkerers Blog (Amsterdam)",
+    "querySuggestions": [
+      "Who are you?",
+      "Compare the talk by Lucas and Tomas",
+      "What are advantages of small models?",
+      "Which speaker talked about the future of AI?",
+      "Summarize all given posts in one sentence"
+    ]
   },
   "socials": [
     {

@@ -26,7 +26,7 @@ import {SupportedContentTypes} from "@/types/plugins.types";
 import {ContentHandler} from "@/lib/content-plugins";
 import {groupBy} from "@/lib/content-plugins/utils";
 import {ApiTypes} from "@/types/api.type";
-import {NexlogConfigAll} from "@/types/nexlog.types";
+import {GrayConfigAll} from "@/types/gray.types";
 import {StructuredUserInput, UserInputType} from "@/types/prompt.types";
 import * as unbodyUtils from "@/services/unbody.utils";
 import {parseJsonOutput} from "@/utils/prompt-templates/prompt.utils";
@@ -149,7 +149,7 @@ const buildSiteContext = async (
 
     let context: SiteContext = {
         siteType: essentials.siteType || defaultContext.siteType || SiteType.BLOG,
-        title: essentials.title || defaultContext.title || "Nexlog",
+        title: essentials.title || defaultContext.title || "Gray",
         autoEntities: entities,
         autoKeywords: keywords,
         autoTopics: topics,
@@ -159,6 +159,7 @@ const buildSiteContext = async (
         autoSummary: "",
         contentSummary: siteContentSummary,
         availableContentTypes,
+        querySuggestions: essentials.querySuggestions || defaultContext.querySuggestions || [],
     };
 
     console.log("3.2 Generating site summary intro");
@@ -452,7 +453,7 @@ const searchAboutOnVideoFiles = async <T>(
 
 const searchAboutMixed = async ({siteData, siteConfig, input, filters = [], types = []}: {
     siteData: SiteData,
-    siteConfig: NexlogConfigAll,
+    siteConfig: GrayConfigAll,
     input: StructuredUserInput,
     filters: string[],
     types?: SupportedContentTypes[]
@@ -645,7 +646,7 @@ const searchAboutOnImageBlocks = async <T>(
 
 const searchSubtitles = async ({input, siteConfigs, siteData, filters}: {
     input: StructuredUserInput,
-    siteConfigs: NexlogConfigAll,
+    siteConfigs: GrayConfigAll,
     siteData: SiteData,
     filters: string[],
 }): Promise<ApiTypes.Rs.SearchResults<ISubtitleEntry[]>> => {
@@ -679,7 +680,7 @@ const searchSubtitles = async ({input, siteConfigs, siteData, filters}: {
 
 const searchSummaryVideo = async ({input, siteConfigs, siteData, filters}: {
     input: StructuredUserInput,
-    siteConfigs: NexlogConfigAll,
+    siteConfigs: GrayConfigAll,
     siteData: SiteData,
     filters: string[],
 }): Promise<ApiTypes.Rs.AISearchSummary<ISubtitleEntry[]>> => {
@@ -755,7 +756,7 @@ const searchSummaryVideo = async ({input, siteConfigs, siteData, filters}: {
 
 const searchAIResponse = async (
     siteData: SiteData,
-    siteConfig: NexlogConfigAll,
+    siteConfig: GrayConfigAll,
     input: StructuredUserInput,
     minScore?: number,
 ): Promise<ApiTypes.Rs.AISearchSummary<any>> => {

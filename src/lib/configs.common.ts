@@ -1,41 +1,41 @@
-import {NexlogConfigAll} from "@/types/nexlog.types";
-import customConfigs from "../../nexlog.config";
-import {nexLogDefaultConfigs} from "@/config";
+import {GrayConfigAll} from "@/types/gray.types";
+import customConfigs from "../../gray.config";
+import {grayDefaultConfigs} from "@/config";
 
-export const getConfigs = (): NexlogConfigAll => {
+export const getConfigs = (): GrayConfigAll => {
     const contentPlugins =
         customConfigs.contentPlugins ?
-            nexLogDefaultConfigs.contentPlugins.map(defaultPlugin => {
+            grayDefaultConfigs.contentPlugins.map(defaultPlugin => {
                 const customPlugin = customConfigs.contentPlugins?.find(
                     customPlugin => customPlugin.type === defaultPlugin.type
                 );
                 return customPlugin || defaultPlugin;
             })
-            : nexLogDefaultConfigs.contentPlugins;
+            : grayDefaultConfigs.contentPlugins;
 
     const contentConfig =
         customConfigs.contentConfig ?
             {
-                ...nexLogDefaultConfigs.contentConfig,
+                ...grayDefaultConfigs.contentConfig,
                 ...customConfigs.contentConfig
             }
-            : nexLogDefaultConfigs.contentConfig;
+            : grayDefaultConfigs.contentConfig;
 
     const searchConfig =
         customConfigs.searchConfig ?
             {
-                ...nexLogDefaultConfigs.searchConfig,
+                ...grayDefaultConfigs.searchConfig,
                 prompts: [
-                    ...nexLogDefaultConfigs.searchConfig.prompts.filter(p => {
+                    ...grayDefaultConfigs.searchConfig.prompts.filter(p => {
                         return !customConfigs.searchConfig?.prompts.find(cp => cp.type === p.type);
                     }),
                     ...customConfigs.searchConfig.prompts
                 ]
             }
-            : nexLogDefaultConfigs.searchConfig;
+            : grayDefaultConfigs.searchConfig;
 
     const personaConfig = {
-        ...nexLogDefaultConfigs.copy,
+        ...grayDefaultConfigs.copy,
         ...customConfigs.copy
     }
 
