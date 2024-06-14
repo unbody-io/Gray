@@ -38,7 +38,7 @@ export const DefaultsMenu = () => {
                 </DropdownTrigger>
                 <DropdownMenu aria-label="Menu Actions"
                               variant="shadow"
-                              className={"w-[400px]"}
+                              className={"md:w-[400px]"}
                 >
                     <DropdownSection title="Pages" showDivider>
                         <DropdownItem key="profile">

@@ -19,7 +19,6 @@ import {ApiTypes} from "@/types/api.type";
 import {ISubtitleEntry} from "@unbody-io/ts-client/build/core/documents";
 import {useSiteData} from "@/context/context.site-data";
 import {ParagraphSkeleton} from "@/components/skeletons";
-import {BlogIntro} from "@/components/BlogIntro";
 
 type PostPageProps = {
     data: EnhancedVideoFileWithContent

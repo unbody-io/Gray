@@ -8,6 +8,7 @@ import {VideoThumbnail} from "@/components/VideoThumbnail";
 import {Article_CARD_HEIGHT} from "@/config/ui.config";
 import {useSiteData} from "@/context/context.site-data";
 import {SupportedContentTypes} from "@/types/plugins.types";
+import clsx from "clsx";
 
 type CardProps = {
     data: EnhancedVideoFile | null;
@@ -41,7 +42,10 @@ const DefaultsVideoCardBody = (props: CardProps) => {
                     filter: "grayscale(100%)"
                 }}
             />
-            <CardBody className={"w-full h-full backdrop-blur-xl grid grid-cols-12 align-top"}>
+            <CardBody className={clsx(
+                "w-full h-full backdrop-blur-xl grid align-top",
+                `md:grid-cols-12`
+            )}>
                 <div className={"col-span-3"}>
                     <VideoThumbnail
                         videoFile={data}
@@ -49,11 +53,14 @@ const DefaultsVideoCardBody = (props: CardProps) => {
                     />
                 </div>
                 <div className={"w-full col-span-8"}>
-                    <CardHeader className="flex-col items-start mb-0 pb-0">
+                    <CardHeader className={clsx(
+                        'flex-col items-start mb-0 pb-0',
+                        'max-w-full'
+                    )}>
                         <div className="flex gap-2 justify-center align-middle text-tiny text-gray-500">
                             <span>{data.speaker as string}</span>
                         </div>
-                        <h4 className="max-w-md truncate capitalize pt-1 pb-1">
+                        <h4 className="max-w-xs md:max-w-md md:truncate capitalize pt-1 pb-1">
                             {data.title as string}
                         </h4>
                     </CardHeader>
