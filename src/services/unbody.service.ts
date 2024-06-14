@@ -29,7 +29,7 @@ import {ApiTypes} from "@/types/api.type";
 import {NexlogConfigAll} from "@/types/nexlog.types";
 import {StructuredUserInput, UserInputType} from "@/types/prompt.types";
 import * as unbodyUtils from "@/services/unbody.utils";
-import {QueryBuilder} from "@unbody-io/ts-client/build/core/query-builder";
+import {parseJsonOutput} from "@/utils/prompt-templates/prompt.utils";
 
 if (!process.env.UNBODY_API_KEY || !process.env.UNBODY_PROJECT_ID) {
     throw new Error("UNBODY_API_KEY and UNBODY_PROJECT_ID must be set");
@@ -206,25 +206,48 @@ const buildSiteContext = async (
 const createDirectories = async (
     allPosts: Array<MiniArticle | IVideoFile>,
     contentPlugins: ContentHandler<any, any>[],
+    siteData: SiteData
 ): Promise<Directory[]> => {
-    const directoryGroups = groupBy(allPosts,
-        ({pathString}) => {
-            if (!pathString) return "";
-            return (pathString as string).split("/")[1];
-        }
-    );
+    // we can determine a category either by posts or by direct google doc inside the directory
+    // allPosts here only contains the posts, we need to get the directories from the google docs
+    const {data: {payload: indexFiles}} = await unbody.get.googleDoc.select("pathString")
+        .exec()
+        .catch(e => ({data: {payload: []}}));
 
-    return Promise.all(Object.entries(directoryGroups).map(async ([directory, posts]) => {
-        if (directory.trim().length === 0) return null;
-        if (posts.length === 0) return null;
+    const directoryNames = new Set(indexFiles.map(({pathString}) => {
+        if (!pathString) return "";
+        return (pathString as string).split("/")[1];
+    }));
 
-        const postRefs = posts.map((post) => {
-            const plugin = contentPlugins.find(p => p.type === post.__typename);
-            return plugin?.getPostReference(post) as PostRef;
+    return Promise.all(Array.from(directoryNames).map(async (directory) => {
+        const postsInDirectory = allPosts.filter((post) => {
+            if (!post.pathString) return false;
+            return (post.pathString as string).startsWith(`/${directory}/`);
         });
 
-        // The direct file in directory which has the same name as the directory is the directory document
-        const directoryDoc = await unbody.get
+
+        let prompt = "You are going to help me define and extract some information from the given document.\n";
+        prompt += `This is a content that represent one single directory in a website, where all directories are related to eachother, the context and content of each can be different.`;
+        prompt += `Your task is to analysis the content {title},{text},{pathString} of this particular directory and define the nature of the directory as a whole.`;
+        prompt += `for example, it could belong to an event where each directory is a different event, or they could be different categories of a blog.`;
+        prompt += `**Extra context of entire website:**\n:Summary:"${siteData.context.contentSummary}" - type:"${typeof siteData}"\n`
+        prompt += `**Output**\nyou need to extract the following information:\n`;
+        prompt += `1. **type**: Type and nature of the directory (e.g; event, theme, category)\n`;
+        prompt += `2.**dateValue:** if there is any date value in the directory which is important (e.g date of an event, or publishing date etc) - be exact\n`;
+        prompt += `3.**dateLabel:** what is the date value represents (e.g; event date, publishing date etc)\n`;
+        prompt += `4.**location:** if there is any location value in the directory which is important (e.g location of an event, or publishing location etc) - be exact\n`;
+        prompt += `5.**locationLabel:** what is the location value represents (e.g; event location, publishing location etc)\n`;
+        prompt += `Output should be in json format, for example:\n`;
+        prompt += `
+            \`\`\`JSON{
+                "type": "event",
+                "dateValue": "2022-10-10",
+                "dateLabel": "date",
+                "location": "12A Luxa street, New York,",
+                "locationLabel": "location"
+            }\`\`\`
+        `
+        const {data: {payload, generate}} = await unbody.get
             .googleDoc
             .where(({
                 pathString: `/${directory}/${directory}`
@@ -253,14 +276,16 @@ const createDirectories = async (
                 "blocks.ImageBlock.alt",
                 "blocks.ImageBlock.__typename",
                 "blocks.TextBlock.__typename",
-                "mentions"
+                "mentions",
+                "modifiedAt",
+                "createdAt",
             )
+            .generate
+            .fromOne(prompt)
             .exec()
-            .then(({data: {payload}}) => payload[0] as IGoogleDoc | null)
-            .catch(e => {
-                console.error("Error getting directory document", e);
-                return null;
-            })
+
+        const directoryDoc = payload? payload[0] as IGoogleDoc : {};
+        const generated = parseJsonOutput(generate[0].result||"");
 
         let cover = await unbody.get
             .imageBlock
@@ -279,6 +304,7 @@ const createDirectories = async (
         cover = cover || directoryDoc?.blocks?.find(b => b.__typename === "ImageBlock");
 
         return {
+            ...directoryDoc,
             name: directory,
             title: directoryDoc?.title || directory,
             text: directoryDoc?.text || "",
@@ -288,10 +314,10 @@ const createDirectories = async (
             autoKeywords: directoryDoc?.autoKeywords || [],
             autoSummary: directoryDoc?.autoSummary || "",
             cover: cover || null,
-            items: postRefs,
-        }
+            items: postsInDirectory,
+            customData: generated,
+        } as Directory;
     })).then((directories) => directories.filter((d) => !!d)) as Promise<Directory[]>;
-
 }
 
 const populateCategories = async (
@@ -348,7 +374,6 @@ const populateCategories = async (
 }
 
 const generateCategories = async (siteContext: SiteContext): Promise<CategoryRaw[]> => {
-    console.log("Generating categories");
     try {
         const {data: {generate, errors}} = await unbody.get
             .textBlock
@@ -689,7 +714,7 @@ const searchSummaryVideo = async ({input, siteConfigs, siteData, filters}: {
         })
         .limit(100);
 
-    if(input.requires_search) {
+    if (input.requires_search) {
         // @ts-ignore
         query = query.search.about(input.concepts_key_terms.join(", "))
     }

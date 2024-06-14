@@ -1,42 +1,15 @@
 import {IGoogleDoc, IImageBlock, ITextBlock} from "@unbody-io/ts-client/build/core/documents";
 import {uniqueBy} from "@/utils/data.utils";
 import {FC, useMemo} from "react";
-import {UnbodyImage} from "@/components/Image";
 import {ImageBlock} from "@/types/data.types";
-import Image from "next/image";
-import {windowScrollY} from "@/utils/ui.utils";
-import {formatDate} from "@/utils/date.utils";
-import {Divider} from "@nextui-org/react";
 import {EnhancedGDocWithContent} from "@/types/custom.type";
 import {TextBlock} from "@unbody-io/ts-client/build/types/TextBlock.types";
 import {SupportedContentTypes} from "@/types/plugins.types";
-import {TagProps} from "@/types/ui.types";
-import {ParagraphBlock} from "@/components/defaults/content-blocks/Block.Paragraph";
+import {GDocPostHeader} from "@/components/post/GDoc.Post.Header";
+import {GDocPostBody} from "@/components/post/GDoc.Post.Body";
 
 type Props = {
     data: EnhancedGDocWithContent
-}
-
-const UnbodyTextBlock = ({data, keywords}: {data: ITextBlock, keywords: TagProps[]}) => {
-    switch (data.tagName) {
-        case "h1":
-            return <h1>{data.text as string}</h1>
-        case "h2":
-            return <h2>{data.text as string}</h2>
-        case "h3":
-            return <h3>{data.text as string}</h3>
-        case "h4":
-            return <h4>{data.text as string}</h4>
-        case "h5":
-            return <h5>{data.text as string}</h5>
-        case "h6":
-            return <h6>{data.text as string}</h6>
-        case "p":
-            return <ParagraphBlock html={data.html as string} keywords={keywords}/>
-        case "ul":
-            return <ul dangerouslySetInnerHTML={{__html: data.html as string}}/>
-
-    }
 }
 
 
@@ -47,35 +20,9 @@ const isTitle = (block: TextBlock) => {
 
 const isPreviewImage = (block: ITextBlock | IImageBlock) => {
     //@ts-ignore
-    return block.__typename === "ImageBlock" && block.order === 1;
+    return block.__typename === "ImageBlock" && block.order < 3;
 }
 
-
-type PreviewImageProps = {
-    data: ImageBlock
-    height?: number
-}
-
-const PreviewImage = ({data, height = 500}: PreviewImageProps) => {
-    const scrollY = windowScrollY()
-    return (
-        <div className={`rounded-xl overflow-hidden relative w-full`}
-             style={{height: `${height}px`}}
-        >
-            <Image src={`${data.url}?w=1.0&h=${height}&fit=crop&crop=faces,entropy,edges`}
-                   alt={data.alt}
-                   // width={data.width}
-                   // height={100}
-                   fill={true}
-                   objectFit={"cover"}
-                   objectPosition={"center"}
-                   style={{
-                       transform: `scale(${1 + (scrollY / 2500)})`,
-                   }}
-            />
-        </div>
-    )
-}
 
 export const GDocPost = ({data}: Props) => {
     const keywords = useMemo(() => {
@@ -90,62 +37,26 @@ export const GDocPost = ({data}: Props) => {
         return (data.blocks as (ITextBlock | IImageBlock)[]).find(isPreviewImage) as ImageBlock
     }, [data.blocks]);
 
+    const blocks = useMemo(() => {
+        return (data.blocks)!
+            .sort((a, b) => a.order - b.order)
+            .filter(b => (
+                !isPreviewImage(b as unknown as ImageBlock)
+                && (
+                    b.__typename === SupportedContentTypes.TextBlock
+                    && !isTitle(b as unknown as TextBlock)
+                )
+            ))
+    }, [data.blocks]);
+
     return (
         <div className={"flex flex-col items-center"}>
-            <header className={"w-full flex items-center flex-col"}>
-                {
-                    previewImage &&
-                    <PreviewImage data={previewImage}/>
-                }
-                <div className={"max-w-screen-md flex-col flex gap-4 my-6"}>
-                    <span className={"text-gray-500 text-sm"}>
-                        Published on {
-                            // @ts-ignore
-                            formatDate(data.modifiedAt as string)
-                        }
-                    </span>
-                    <h1 className={"text-4xl py-4"}>
-                        {data.title as string}
-                    </h1>
-                    <p className={"text-xl "}>
-                        {
-                            data.autoSummary as string
-                        }
-                    </p>
-                    <Divider/>
-                </div>
-            </header>
-
-            <article className={"prose mt-4 prose-img:rounded-xl prose-a:text-blue-600 max-w-screen-md"}>
-                {
-                    (data.blocks)!
-                        .sort((a, b) => a.order - b.order)
-                        .filter(b => (
-                            !isPreviewImage(b as unknown as ImageBlock)
-                            && (
-                                b.__typename === SupportedContentTypes.TextBlock
-                                && !isTitle(b as unknown as TextBlock)
-                            )
-                        ))
-                        // @ts-ignore
-                        .map((block, index) => {
-                            if (block.__typename === "TextBlock") {
-                                return (
-                                    <UnbodyTextBlock data={block as ITextBlock}
-                                                     keywords={keywords}
-                                                     key={index}
-                                    />
-                                )
-                            }
-                            if (block.__typename === "ImageBlock") {
-                                return <UnbodyImage
-                                    data={block as ImageBlock}
-                                    key={index}
-                                />
-                            }
-                        })
-                }
-            </article>
+            <GDocPostHeader data={data as IGoogleDoc}
+                            previewImage={previewImage}
+            />
+            <GDocPostBody data={{...data, blocks: blocks}}
+                          keywords={keywords}
+            />
         </div>
     )
 }

@@ -12,14 +12,7 @@ export const renderPrompt = (prompt: PromptInput): string => {
 
 export const parseJsonOutput = <T>(rawResult: string): T|null => {
     try {
-        console.log("-")
-        console.log("rawResult")
-        console.log(rawResult)
-        console.log("-")
-
         const cleanJsonString = rawResult.replace(/```json|```/g, '');
-        console.log("cleanJsonString")
-        console.log(cleanJsonString)
         return JSON.parse(cleanJsonString) as T;
     } catch (e) {
         console.log(rawResult);

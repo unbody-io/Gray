@@ -54,9 +54,6 @@ export const DirectoryList = ({data: directories}: Props) => {
             <div className={clsx(...gardenClassesL)}
                  style={{
                      width: `${maskWidth*2}px`,
-                     // opacity: "0.1"
-                     // background: "red"
-                     // left: `-${maskWidth*0.1}px`,
                 }}
             />
             <div className={clsx(...gardenClassesR)}
@@ -70,26 +67,17 @@ export const DirectoryList = ({data: directories}: Props) => {
                 'overflow-y-hidden',
                 // 'flex',
             )}>
-                <div className={`grid grid-cols-4 z-1`}
+                <div className={`grid grid-cols-${cols+1} z-1`}
                      style={{
                          gap,
                          width: `${Math.max(directories.length, cols+1) * (maxContainerW/cols)}px`,
-                         // width: `70vw`,
-                         // minWidth: "100%",
-                         // width: `calc(10px + calc(${directories.length * 100}% / ${directories.length}))`,
                          paddingLeft: `${maskWidth}px`,
                          paddingRight: `${maskWidth}px`,
-                         // background: "red"
                     }}
                 >
                     {
                         directories.map((directory, i) => (
-                            <div key={i}
-                                 style={{
-                                     // width: `calc(100% / ${directories.length})`,
-                                     // flexBasis: `calc(100% / ${directories.length})`,
-                                }}
-                            >
+                            <div key={i}>
                                 <DirectoryCard data={directory}/>
                             </div>
                         ))

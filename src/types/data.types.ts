@@ -48,6 +48,7 @@ export type PostRef = {
 } & {[key: string]: string};
 
 export type Directory = {
+    slug: string;
     name: string;
     title: string;
     text: string;
@@ -61,6 +62,13 @@ export type Directory = {
     cover: IImageBlock;
 
     items: PostRef[];
+    customData: {
+        type: string
+        dateValue: string
+        dateLabel: string
+        location: string
+        locationLabel: string
+    } | null
 }
 
 export type Topic = {

@@ -16,8 +16,72 @@ type ListProps = {
 
 type Block = (EnhancedTextBlock | IImageBlock);
 
-export const SearchResultsList = ({results, isQueryLoading}: ListProps) => {
+type PostsListProps = {
+    posts: ApiTypes.Rs.SearchResults
+    refBlocks: Block[]
+}
+
+export const PostsList = ({posts, refBlocks}: PostsListProps) => {
     const {components, configs: {plugins}} = useSiteData();
+    return (
+        <div className={"flex flex-col gap-8"}>
+            {
+                posts
+                    .filter(result => (
+                        result.type in components.perContentType
+                    ))
+                    .map((result, i) => {
+                        const component = components.perContentType[result.type];
+                        const plugin = plugins.find(plugin => plugin.type === result.type);
+
+                        const ListComponent = component.list.component
+                        const CardComponent = component.card.component;
+                        const CardWithRefsComponent = component.card_with_refs.component;
+
+                        if (!(ListComponent && (CardComponent || CardWithRefsComponent)) || !plugin) {
+                            console.error(`List or Card component not found for type: ${result.type}`);
+                            return null;
+                        }
+
+                        // TODO we need to handle the component.list.loading state here
+                        return (
+                            <ListComponent key={i}
+                                           label={plugin?.label}
+                            >
+                                {
+                                    result.data.map((data, j) => {
+                                        if (CardWithRefsComponent) {
+                                            return (
+                                                <CardWithRefsComponent key={j}
+                                                                       data={data}
+                                                                       postRefs={refBlocks.filter(b => {
+                                                                           // @ts-ignore
+                                                                           return (
+                                                                               // @ts-ignore
+                                                                               b.document[0][plugin.identifier] === data[plugin.identifier]
+                                                                           )
+                                                                       })}
+                                                />
+                                            )
+                                        }else if (CardComponent) {
+                                            return (
+                                                <CardComponent key={j}
+                                                               data={data}
+                                                />
+                                            )
+                                        }
+                                    })
+                                }
+                            </ListComponent>
+                        )
+                    })
+            }
+        </div>
+    )
+}
+
+export const SearchResultsList = ({results, isQueryLoading}: ListProps) => {
+    const {configs: {plugins}} = useSiteData();
 
     if (results.isLoading) {
         return (
@@ -93,106 +157,9 @@ export const SearchResultsList = ({results, isQueryLoading}: ListProps) => {
 
     return (
         <div className={"flex flex-col gap-8"}>
-            {
-                posts
-                    .filter(result => (
-                        result.type in components.perContentType
-                    ))
-                    .map((result, i) => {
-                        const component = components.perContentType[result.type];
-                        const plugin = plugins.find(plugin => plugin.type === result.type);
-
-                        const ListComponent = component.list.component
-                        const CardComponent = component.card.component;
-                        const CardWithRefsComponent = component.card_with_refs.component;
-
-                        if (!(ListComponent && (CardComponent || CardWithRefsComponent)) || !plugin) {
-                            console.error(`List or Card component not found for type: ${result.type}`);
-                            return null;
-                        }
-
-                        // TODO we need to handle the component.list.loading state here
-                        return (
-                            <ListComponent key={i}
-                                           label={plugin?.label}
-                            >
-                                {
-                                    result.data.map((data, j) => {
-                                        if (CardWithRefsComponent) {
-                                            return (
-                                                <CardWithRefsComponent key={j}
-                                                                       data={data}
-                                                                       postRefs={refBlocks.filter(b => {
-                                                                           // @ts-ignore
-                                                                           return (
-                                                                               // @ts-ignore
-                                                                               b.document[0][plugin.identifier] === data[plugin.identifier]
-                                                                           )
-                                                                       })}
-                                                />
-                                            )
-                                        }else if (CardComponent) {
-                                            return (
-                                                <CardComponent key={j}
-                                                               data={data}
-                                                />
-                                            )
-                                        }
-                                    })
-                                }
-                            </ListComponent>
-                        )
-                    })
-            }
-
-            {/*{*/}
-            {/*    articles&&*/}
-            {/*    <List loading={articles.isLoading}*/}
-            {/*          error={articles.error}*/}
-            {/*          pageSize={2}*/}
-            {/*          itemName={"Related Articles"}*/}
-            {/*          wrapperClassName={"flex flex-col gap-4"}*/}
-            {/*          listClassName={"flex flex-col gap-4"}*/}
-
-            {/*    >*/}
-            {/*        {*/}
-            {/*            articles.data &&*/}
-            {/*            articles.data.map((article, i) => (*/}
-            {/*                <DefaultCard key={`a-${i}`}*/}
-            {/*                             className={"bg-default-200/100 pb-3"}*/}
-            {/*                >*/}
-            {/*                    {*/}
-            {/*                        <DefaultsArticleCardBody data={article}/>*/}
-            {/*                    }*/}
-            {/*                </DefaultCard>*/}
-            {/*            ))*/}
-            {/*        }*/}
-            {/*    </List>*/}
-            {/*}*/}
-            {/*{*/}
-            {/*    blocks &&*/}
-            {/*    <List loading={blocks.isLoading}*/}
-            {/*          error={blocks.error}*/}
-            {/*          pageSize={2}*/}
-            {/*          itemName={"Related Blocks"}*/}
-            {/*          listClassName={"grid gap-2 grid-cols-2"}*/}
-            {/*          wrapperClassName={"flex flex-col gap-4"}*/}
-            {/*    >*/}
-            {/*        {*/}
-            {/*            blocks.data &&*/}
-            {/*            blocks.data.map((block, i) => (*/}
-            {/*                <div>*/}
-            {/*                    {block.__typename}*/}
-            {/*                </div>*/}
-            {/*                // <BlockCard key={i}*/}
-            {/*                //            className={""}*/}
-            {/*                // >*/}
-            {/*                //     <TextBlockCardBody data={block as MiniTextBlock}/>*/}
-            {/*                // </BlockCard>*/}
-            {/*            ))*/}
-            {/*        }*/}
-            {/*    </List>*/}
-            {/*}*/}
+            <PostsList posts={posts}
+                       refBlocks={refBlocks}
+            />
         </div>
     )
 }

@@ -39,6 +39,15 @@ import {getConfigs} from "@/lib/configs.common";
         availableContent,
     );
 
+    console.log("creating directories")
+    const directories = await unbodyService.createDirectories(
+        records.flatMap(({posts}) => posts),
+        contentPlugins,
+        {
+            context: siteContext
+        } as SiteData
+    );
+    console.log(`directories: ${directories.length}`)
 
     const categories = await unbodyService.generateCategories(
         siteContext
@@ -52,13 +61,6 @@ import {getConfigs} from "@/lib/configs.common";
         contentConfig.postsPath
     );
 
-    console.log("creating directories")
-    const directories = await unbodyService.createDirectories(
-        records.flatMap(({posts}) => posts),
-        contentPlugins
-    );
-
-    console.log(`directories: ${directories.length}`)
 
     const siteData: SiteData = {
         categories: populatedCategories,
