@@ -18,7 +18,7 @@ export const BlockList = (props: ArticleListProps) => {
 
     if (error) return <div>Error</div>;
     if (isLoading) return <div>Loading...</div>;
-    if (!data) return null;
+    if (!data || data.length===0) return null;
 
     return (
         <div>

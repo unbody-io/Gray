@@ -15,7 +15,6 @@ import Link from "next/link";
 
 export const DefaultsMenu = () => {
     const {context, icon} = useSiteData();
-    console.log("icon", icon);
     return (
         <div className={clsx(
             "flex items-center gap-4 fixed",
@@ -109,7 +108,6 @@ export const DefaultsMenu = () => {
                     </DropdownSection>
                 </DropdownMenu>
             </Dropdown>
-
         </div>
     );
 }

@@ -39,6 +39,8 @@ export const CategoryCardStack = (props: Props) => {
     const posts = useApiPost<ApiTypes.Rq.StaticPosts, ApiTypes.Rs.StaticPosts>(`/api/static/posts`, false);
     const blocks = useApiPost<ApiTypes.Rq.Search, ApiTypes.Rs.SearchResults>(`/api/search/mix`, false);
 
+    console.log("blocks", blocks)
+
     const onStackClicked = () => {
         if (onOpen) {
             // Only toggle if either no stack is open or the clicked stack is already open
@@ -84,12 +86,29 @@ export const CategoryCardStack = (props: Props) => {
         });
     }
 
+    const textBlocks = blocks.data?.find(g => g.type === SupportedContentTypes.TextBlock);
+    const imageBlocks = blocks.data?.find(g => g.type === SupportedContentTypes.ImageBlock);
+
+
+    const [gap, setGap] = React.useState(20);
+    React.useEffect(() => {
+        const onResize = () => {
+            if (window.innerWidth < 768) {
+                setGap(10);
+            }
+        }
+
+        window.addEventListener('resize', onResize);
+        return () => window.removeEventListener('resize', onResize);
+    }, [])
+
+
     return (
         <CardStack onOpen={onOpen}
                    openIndex={openIndex}
                    index={index}
                    height={Article_CARD_HEIGHT}
-                   gap={50}
+                   gap={gap}
                    maxStackSize={Math.min(5, (items.length) + 2)}
         >
             <CategoryHeadCard data={props.data}
@@ -143,7 +162,10 @@ export const CategoryCardStack = (props: Props) => {
                     <div>
                         <div className={"text-sm pb-4"}>Related content blocks</div>
                         <BlockList payload={{
-                            data: blocks.data || null,
+                            data: [
+                                ...(textBlocks? textBlocks.data:[]),
+                                ...(imageBlocks? imageBlocks.data: [])
+                            ] || null,
                             isLoading: blocks.isLoading,
                             error: blocks.error
                         } as SWRResponse<ContentBlock[]|null, any>}

@@ -3,15 +3,28 @@ import DefaultLayout from "@/layouts/default";
 import {getConfigs} from "@/lib/configs.common";
 import {SupportedContentTypes} from "@/types/plugins.types";
 import {EnhancedGDocWithContent} from "@/types/custom.type";
-import {GDocPost} from "@/components/post/GDoc.Post";
+import {GDocPost, isPreviewImage} from "@/components/post/GDoc.Post";
+import {useMemo} from "react";
+import {IImageBlock, ITextBlock} from "@unbody-io/ts-client/build/core/documents";
+import {ImageBlock} from "@/types/data.types";
 
 type PostPageProps = {
     data: EnhancedGDocWithContent
 }
 
 const PostPage = ({data}: PostPageProps) => {
+    const previewImage = useMemo(() => {
+        return (data.blocks as (ITextBlock | IImageBlock)[]).find(isPreviewImage) as ImageBlock
+    }, [data.blocks]);
     return (
-        <DefaultLayout containerMaxWidth={`max-w-screen-xl`}>
+        <DefaultLayout containerMaxWidth={`max-w-screen-xl`}
+                       metaProps={{
+                           title: data.title as string,
+                           description: data.autoSummary as string,
+                           keywords: data.autoKeywords as string[],
+                           image: previewImage? `${previewImage.url}?w=800` : undefined
+                       }}
+        >
             <GDocPost data={data}/>
         </DefaultLayout>
     )

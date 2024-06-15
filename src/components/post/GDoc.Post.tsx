@@ -12,13 +12,12 @@ type Props = {
     data: EnhancedGDocWithContent
 }
 
-
 const isTitle = (block: TextBlock) => {
     // @ts-ignore
     return (block.classNames || []).includes("title");
 }
 
-const isPreviewImage = (block: ITextBlock | IImageBlock) => {
+export const isPreviewImage = (block: ITextBlock | IImageBlock) => {
     //@ts-ignore
     return block.__typename === "ImageBlock" && block.order < 3;
 }

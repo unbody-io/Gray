@@ -78,7 +78,14 @@ const PostPage = ({data}: PostPageProps) => {
     }, [isFocused])
 
     return (
-        <DefaultLayout containerMaxWidth={`max-w-screen-md relative`}>
+        <DefaultLayout containerMaxWidth={`max-w-screen-md relative`}
+                       metaProps={{
+                           title: data.title as string,
+                           description: data.autoSummary as string,
+                           image: data.thumbnailUrl!.jpeg as string,
+                           keywords: data.autoKeywords as string[],
+                       }}
+        >
             {
                 isInSearchMode && (
                     <>

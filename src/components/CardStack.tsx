@@ -29,6 +29,10 @@ export const CardStack = (props: Props) => {
 
     const [totalHeightOfChildren, setTotalHeightOfChildren] = useState(0);
     useEffect(() => {
+        onResize();
+    }, [childArray.length, gap]);
+
+    const onResize = () => {
         if (ref.current && isOpen) {
             let totalHeight = 0;
             ref.current.childNodes.forEach((child) => {
@@ -36,10 +40,18 @@ export const CardStack = (props: Props) => {
             });
             setTotalHeightOfChildren(totalHeight + childCount*gap);
         }
-    }, [childArray.length]);
+    }
+
+
+    useEffect(() => {
+        window.addEventListener('resize', onResize);
+        return () => window.removeEventListener('resize', onResize);
+    },[])
+
 
     const getTopWhenOpen = (index: number) => {
-        return index*height + index*gap/2;
+        const h = totalHeightOfChildren/childCount;
+        return (index*h) + (index*gap)/2;
     }
     const getTopWhenClosed = (index: number) => {
         return hovering ? index * 10 : index * 7;
