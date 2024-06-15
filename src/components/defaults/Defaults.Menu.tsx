@@ -77,7 +77,7 @@ export const DefaultsMenu = () => {
                                 <EmailIcon fill={"gray"}
                                            width={24}
                                 />
-                                <a href={"mailto:info@unbody.io"}>
+                                <a href={"https://forms.gle/noWdVBCaqbk4v3Jz7"}>
                                     Get your own Gray blog
                                 </a>
                             </div>
