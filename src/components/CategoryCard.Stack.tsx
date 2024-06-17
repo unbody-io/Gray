@@ -39,8 +39,6 @@ export const CategoryCardStack = (props: Props) => {
     const posts = useApiPost<ApiTypes.Rq.StaticPosts, ApiTypes.Rs.StaticPosts>(`/api/static/posts`, false);
     const blocks = useApiPost<ApiTypes.Rq.Search, ApiTypes.Rs.SearchResults>(`/api/search/mix`, false);
 
-    console.log("blocks", blocks)
-
     const onStackClicked = () => {
         if (onOpen) {
             // Only toggle if either no stack is open or the clicked stack is already open

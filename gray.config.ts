@@ -1,9 +1,9 @@
-import {NextlogConfig} from "@/types/gray.types";
 import {ContentHandler} from "@/lib/content-plugins";
 import {defaultVideoFileHandlerOptions} from "@/lib/content-plugins/video-files";
 import {videoComparator, videoEnhancer} from "@/lib/ai-thinkerers/content";
+import {GrayConfig} from "@/types/gray.types";
 
-const configs: NextlogConfig ={
+const configs: GrayConfig ={
     contentPlugins: [
         new ContentHandler<any, any>({
             ...defaultVideoFileHandlerOptions,

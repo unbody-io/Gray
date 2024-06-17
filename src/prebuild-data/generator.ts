@@ -61,6 +61,7 @@ import {getConfigs} from "@/lib/configs.common";
         contentConfig.postsPath
     );
 
+    console.log(populatedCategories.map(({title, items}) => (`${title}: ${items.length}`)));
 
     const siteData: SiteData = {
         icon: siteConfigs.icon,

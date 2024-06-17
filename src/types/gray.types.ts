@@ -17,9 +17,9 @@ export type GrayConfigAll = {
     }
 }
 
-export type NextlogConfig = Partial<GrayConfigAll>;
+export type GrayConfig = Partial<GrayConfigAll>;
 
-export type NextLogConfigData = {
+export type GrayConfigData = {
     plugins: HandlerPublicConfigs[];
     contentConfig: {
         exclude: string[],

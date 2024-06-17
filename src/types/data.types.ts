@@ -8,7 +8,7 @@ import {
 import {id} from "postcss-selector-parser";
 import {TextBlock} from "@unbody-io/ts-client/build/types/TextBlock.types";
 import {SupportedContentTypes} from "@/types/plugins.types";
-import {NextLogConfigData} from "@/types/gray.types";
+import {GrayConfigData} from "@/types/gray.types";
 
 export type NameEntity = {
     entity: string
@@ -149,7 +149,7 @@ export type SiteData = {
     categories: Category[]
     directories: Directory[]
     socials: {label: string, link: string, provider: string}[]
-    configs: NextLogConfigData;
+    configs: GrayConfigData;
 }
 
 

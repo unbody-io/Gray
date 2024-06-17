@@ -22,7 +22,7 @@ const instructions: Record<RequiredKeys, any> = {
 }
 
 const examples: SiteContextConfig = {
-    contributors: ["John Doe", "Jane Doe"],
+    contributors: ["John Doe", "Sara Smith"],
     seoDescription: "A site about the latest tech news",
     seoKeywords: ["tech", "news", "latest"],
     siteType: SiteType.BLOG,

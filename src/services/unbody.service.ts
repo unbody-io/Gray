@@ -24,9 +24,8 @@ import {siteEssentialsPrompt} from "@/utils/prompt-templates/prompt.template.sit
 import {siteSummaryPrompt} from "@/utils/prompt-templates/prompt.template.intro";
 import {SupportedContentTypes} from "@/types/plugins.types";
 import {ContentHandler} from "@/lib/content-plugins";
-import {groupBy} from "@/lib/content-plugins/utils";
 import {ApiTypes} from "@/types/api.type";
-import {GrayConfigAll} from "@/types/gray.types";
+import {GrayConfig, GrayConfigAll} from "@/types/gray.types";
 import {StructuredUserInput, UserInputType} from "@/types/prompt.types";
 import * as unbodyUtils from "@/services/unbody.utils";
 import {parseJsonOutput} from "@/utils/prompt-templates/prompt.utils";
@@ -104,7 +103,7 @@ export const getAutoFields = async (
 const buildSiteContext = async (
     defaultContext: SiteContextConfig,
     siteContentSummary: string,
-    availableContentTypes: SupportedContentTypes[],
+    availableContentTypes: SupportedContentTypes[]
 ): Promise<SiteContext> => {
     console.log("Building site context");
     console.log("1. Getting auto fields");
@@ -325,17 +324,17 @@ const populateCategories = async (
     plugins: ContentHandler<any, any>[],
     postsPath: string
 ): Promise<Category[]> => {
-    return Promise.all(categories.map(async (category) => {
+    const allCats = await Promise.all(categories.map(async (category) => {
         const articlesId = plugins.find(p => p.type === SupportedContentTypes.GoogleDoc)?.identifier;
         const videosId = plugins.find(p => p.type === SupportedContentTypes.VideoFile)?.identifier;
 
         const relatedArticles = await unbodyService.searchAboutOnGoogleDocs<MiniArticle>(
             category.title,
             category.entities,
-            category.topics,
+                category.topics,
             [],
             ["remoteId", "__typename", ...(articlesId ? [articlesId] : [])],
-            0.6,
+            0.65,
             postsPath
         )
             .catch(e => {
@@ -349,7 +348,7 @@ const populateCategories = async (
             category.topics,
             [],
             ["remoteId", "__typename", ...(videosId ? [videosId] : [])],
-            0.6,
+            0.7,
             postsPath
         )
             .catch(e => {
@@ -370,6 +369,8 @@ const populateCategories = async (
             }).filter((p) => !!p)
         } as Category;
     }));
+
+    return allCats.filter((c) => c.items.length > 0);
 }
 
 const generateCategories = async (siteContext: SiteContext): Promise<CategoryRaw[]> => {
@@ -415,16 +416,16 @@ const searchAboutOnVideoFiles = async <T>(
         ...entities.map(e => ({value: e, type: "autoEntities"})),
         ...topics.map(t => ({value: t, type: "autoTopics"})),
         ...keywords.map(k => ({value: k, type: "autoKeywords"}))
-    ]
+    ].filter(({value}) => !!value);
 
     if (tags.length > 0 || postsPath) {
         // @ts-ignore
         query = query.where(({Or, And, Like, ContainsAny}) => {
-            const tagsFilter = Or(
+            const tagsFilter = tags.length>0? Or(
                 ...tags.map(({value, type}) => ({
                     [type]: ContainsAny(value)
                 }))
-            );
+            ): null;
 
             const postsPathFilter = postsPath ? {
                 pathString: Like(postsPath)
