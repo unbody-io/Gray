@@ -139,7 +139,7 @@ export const CategoryHeadCard = (props: HeadCardProps) => {
                 {
                     showText ?
                         <>
-                            <span className={"text-sm text-gray-500 animate-fadeIn"}>{summary}</span>
+                            <span className={"text-sm text-gray-500 animate-fadeIn first-letter:capitalize"}>{summary}</span>
                             <Button color={"default"}
                                     size={"sm"}
                                     onClick={onClick}

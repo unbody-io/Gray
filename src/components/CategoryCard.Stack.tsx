@@ -95,11 +95,15 @@ export const CategoryCardStack = (props: Props) => {
                 setGap(10);
             }
         }
-
+        onResize();
         window.addEventListener('resize', onResize);
         return () => window.removeEventListener('resize', onResize);
     }, [])
 
+    const relatedBlocks = isOpen ? [
+        ...(textBlocks ? textBlocks.data : []),
+        ...(imageBlocks ? imageBlocks.data : [])
+    ] : [];
 
     return (
         <CardStack onOpen={onOpen}
@@ -132,7 +136,8 @@ export const CategoryCardStack = (props: Props) => {
                                         switch (ref.__typename) {
                                             case SupportedContentTypes.VideoFile:
                                                 return (
-                                                    <DefaultsVideoCardBody data={getPostDataForRef(ref) as EnhancedVideoFile}/>
+                                                    <DefaultsVideoCardBody
+                                                        data={getPostDataForRef(ref) as EnhancedVideoFile}/>
                                                 )
                                             case SupportedContentTypes.GoogleDoc:
                                                 return (
@@ -149,29 +154,27 @@ export const CategoryCardStack = (props: Props) => {
                     })
             }
 
-            <DefaultCard
-                className={`p-6 ${isOpen ? "bg-content1" : "bg-default-200/100"}`}
-                style={{
-                    height: isOpen ? "auto" : "auto",
-                    overflow: isOpen ? "auto" : "hidden",
-                }}>
-                {
-                    isOpen &&
-                    <div>
-                        <div className={"text-sm pb-4"}>Related content blocks</div>
-                        <BlockList payload={{
-                            data: [
-                                ...(textBlocks? textBlocks.data:[]),
-                                ...(imageBlocks? imageBlocks.data: [])
-                            ] || null,
-                            isLoading: blocks.isLoading,
-                            error: blocks.error
-                        } as SWRResponse<ContentBlock[]|null, any>}
-                                   pageSize={6}
-                        />
-                    </div>
-                }
-            </DefaultCard>
+            {relatedBlocks.length > 0 &&
+                <DefaultCard
+                    className={`p-6 ${isOpen ? "bg-content1" : "bg-default-200/100"}`}
+                    style={{
+                        height: isOpen ? "auto" : "auto",
+                        overflow: isOpen ? "auto" : "hidden",
+                    }}>
+                    {
+                        <div>
+                            <div className={"text-sm pb-4"}>Related content blocks</div>
+                            <BlockList payload={{
+                                data: relatedBlocks || null,
+                                isLoading: blocks.isLoading,
+                                error: blocks.error
+                            } as SWRResponse<ContentBlock[] | null, any>}
+                                       pageSize={6}
+                            />
+                        </div>
+                    }
+                </DefaultCard>
+            }
 
         </CardStack>
     )

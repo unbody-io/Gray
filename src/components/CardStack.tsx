@@ -27,31 +27,46 @@ export const CardStack = (props: Props) => {
     const childCount = React.Children.count(children);
     const childArray = React.Children.toArray(children).slice(0, isOpen?childCount:maxStackSize);
 
+    const [childTops, setChildTops] = useState<number[]>(
+        Array.from({length: childCount}, (_, i) => 0)
+    );
+
     const [totalHeightOfChildren, setTotalHeightOfChildren] = useState(0);
     useEffect(() => {
         onResize();
-    }, [childArray.length, gap]);
+    }, [childArray.length, gap, isOpen]);
 
     const onResize = () => {
         if (ref.current && isOpen) {
             let totalHeight = 0;
-            ref.current.childNodes.forEach((child) => {
+            let tops: number[] = [];
+            ref.current.childNodes.forEach((child, i) => {
+                tops.push(
+                    totalHeight + (i*gap)
+                )
                 totalHeight += (child as HTMLElement).offsetHeight;
             });
+
             setTotalHeightOfChildren(totalHeight + childCount*gap);
+            setChildTops(tops)
         }
     }
 
 
     useEffect(() => {
+        onResize();
         window.addEventListener('resize', onResize);
         return () => window.removeEventListener('resize', onResize);
     },[])
 
+    useEffect(() => {
+    }, [isOpen])
+
 
     const getTopWhenOpen = (index: number) => {
-        const h = totalHeightOfChildren/childCount;
-        return (index*h) + (index*gap)/2;
+        // const h = totalHeightOfChildren/childCount;
+        // return (index*h) + ((index+1)*gap);
+        return childTops[index]
     }
     const getTopWhenClosed = (index: number) => {
         return hovering ? index * 10 : index * 7;
