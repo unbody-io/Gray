@@ -40,9 +40,10 @@ export const getConfigs = (): GrayConfigAll => {
     }
 
     return {
+        ...{...customConfigs, ...grayDefaultConfigs},
         contentPlugins,
         contentConfig,
         searchConfig,
-        copy: personaConfig
+        copy: personaConfig,
     };
 }

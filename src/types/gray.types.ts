@@ -5,6 +5,14 @@ import {SiteData} from "@/types/data.types";
 import {StructuredUserInput} from "@/types/prompt.types";
 
 export type GrayConfigAll = {
+    title: string;
+    icon: string;
+    querySuggestions: string[];
+    socials: {
+        label: string;
+        link: string;
+        provider: string;
+    }[];
     contentPlugins: ContentHandler<any, any>[]
     contentConfig: {
         exclude: string[],
@@ -15,7 +23,7 @@ export type GrayConfigAll = {
         personaPromptInstruction: (siteData: SiteData) => string;
         promptsOutputFormatInstruction: (input: StructuredUserInput) => string;
     }
-}
+};
 
 export type GrayConfig = Partial<GrayConfigAll>;
 

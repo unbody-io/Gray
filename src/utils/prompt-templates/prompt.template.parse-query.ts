@@ -235,6 +235,22 @@ Wrap the output in a codeblock. Provide the result in the following JSON format:
   "requires_search": false
 }
 \`\`\`
+**Example 12:**
+**User Input:** "What did Tomas talked about? compare it to Amir's presentation on AI apps]"
+- **Output:**
+\`\`\`json
+{
+  "type": "Complex Task",
+  "concepts_key_terms": ["Tomas", "talk", "compare", "Amir", "presentation", "AI apps"],
+  "core_question": "",
+  "subject_topic": ["Tomas", "Amir", "AI apps"],
+  "specific_task": "Compare the given talks",
+  "output_format": "",
+  "constraints": "",
+  "context": "",
+  "requires_search": true
+}
+\`\`\`
 
 `,
     parse: (userInput: string) => {

@@ -10,6 +10,27 @@ import {
 } from "@/lib/content-plugins/image-blocks";
 
 const defaults: GrayConfigAll = {
+    title: "Gray Blog",
+    icon: "/img.png",
+    querySuggestions: [
+        "Who are you?",
+        "Compare the talk by Lucas and Tomas",
+        "What are advantages of small models?",
+        "Which speaker talked about the future of AI?",
+        "Summarize all given posts in one sentence"
+    ],
+    socials: [
+        {
+            "label": "Twitter",
+            "link": "https://twitter.com",
+            "provider": "x"
+        },
+        {
+            "label": "Facebook",
+            "link": "https://facebook.com",
+            "provider": "facebook"
+        }
+    ],
     contentPlugins: [
         gdocDefaultHandler,
         videoFileDefaultHandler,

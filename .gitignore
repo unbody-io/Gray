@@ -36,3 +36,5 @@ next-env.d.ts
 
 public/data/*.json
 public/data/**/*.json
+
+.idea/

@@ -4,7 +4,7 @@ dotenv.config();
 dotenv.config({path: ".env.local", override: true});
 
 import {unbodyService} from "@/services/unbody.service";
-import {SiteData} from "@/types/data.types";
+import {SiteContextConfig, SiteData} from "@/types/data.types";
 
 import {
     CATEGORY_DATA_PATH,
@@ -15,13 +15,12 @@ import {
     saveToPublicData
 } from "@/prebuild-data/utils";
 
-import siteConfigs from "../../site.config.json";
 import {InitialPostsData} from "@/types/plugins.types";
 import {getConfigs} from "@/lib/configs.common";
 
 (async () => {
     // override default configs with custom configs
-    const {contentPlugins, contentConfig} = getConfigs();
+    const {contentPlugins, contentConfig, ...defaults} = getConfigs();
 
     const records: InitialPostsData<any>[] = await Promise.all(
         contentPlugins
@@ -33,8 +32,12 @@ import {getConfigs} from "@/lib/configs.common";
     const contentSummary = records.map(({summary}) => summary).join("\n\n");
     const availableContent = records.map(({type}) => type);
 
+    const defaultContext: SiteContextConfig = {
+        title: defaults.title,
+    }
+
     const siteContext = await unbodyService.buildSiteContext(
-        siteConfigs.siteData,
+        defaultContext,
         contentSummary,
         availableContent,
     );
@@ -64,10 +67,10 @@ import {getConfigs} from "@/lib/configs.common";
     console.log(populatedCategories.map(({title, items}) => (`${title}: ${items.length}`)));
 
     const siteData: SiteData = {
-        icon: siteConfigs.icon,
+        icon: defaults.icon,
         categories: populatedCategories,
         context: siteContext,
-        socials: siteConfigs.socials || [],
+        socials: defaults.socials || [],
         directories: directories,
         configs: {
             plugins: contentPlugins.map(plugin => plugin.configs),
