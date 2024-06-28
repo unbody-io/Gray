@@ -30,6 +30,8 @@ AI has transformed writing, and now it's time to enhance reading. Gray is an AI-
 > - Enable all Textual enhancement options using Cohere if not applicable then what is the alternative
 > - Enable all visual enhancement options using openAI GPT-4o
 
+> Make sure to run `prebuild` script for first time. 
+
 Gray allows users to create and manage their blog posts, podcasts, and video blogs on platforms like Google Drive or Github. Users can select the formats and structures they prefer. Unbody then reads this data and builds the blog content. The goal is to reduce the effort spent on data transformation, content generation, and curation.
 So in short, Gray works as follows:
 1. **Content Creation**: Users create content in their preferred format and structure.
@@ -50,7 +52,6 @@ So in short, Gray works as follows:
 ## How to Use
 *Coming soon*
 ```bash
-
 ```
 
 ## Open Source Community
