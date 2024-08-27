@@ -1,6 +1,8 @@
 # Gray
 AI has transformed writing, and now it's time to enhance reading. Gray is an AI-native, open-source blogging framework built in NextJs and powered by [Unbody.io](Unbody.io). Gray makes reading more contextual and dynamic. Designed for both content creators and readers, Gray brings articles, podcasts and video blogs to life, turning reading into an interactive, personalized experience.
 
+https://github.com/unbody-io/Nexlog/assets/7159454/6d350499-7ed1-4212-b310-cb18734929a8
+
 ## Purpose:
 1. **Exploration and Experimentation**: Gray uses AI to explore new ways of engaging readers, adapting content to their context and preferences.
 2. **Dynamic and Contextual Reading**: Gray aims to personalize the reading experience, making content feel specifically tailored and relevant to each user.
