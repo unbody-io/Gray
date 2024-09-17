@@ -213,6 +213,7 @@ const createDirectories = async (
         .exec()
         .catch(e => ({data: {payload: []}}));
 
+
     const directoryNames = new Set(indexFiles.map(({pathString}) => {
         if (!pathString) return "";
         return (pathString as string).split("/")[1];
@@ -223,6 +224,8 @@ const createDirectories = async (
             if (!post.pathString) return false;
             return (post.pathString as string).startsWith(`/${directory}/`);
         });
+
+        if (postsInDirectory.length===0) return [];
 
         let prompt = "You are going to help me define and extract some information from the given document.\n";
         prompt += `This is a content that represent one single directory in a website, where all directories are related to eachother, the context and content of each can be different.`;
@@ -315,7 +318,8 @@ const createDirectories = async (
             items: postsInDirectory,
             customData: generated,
         } as Directory;
-    })).then((directories) => directories.filter((d) => !!d)) as Promise<Directory[]>;
+    }))
+        .then((directories) => directories.filter((d) => !!d)) as Promise<Directory[]>;
 }
 
 const populateCategories = async (
