@@ -225,7 +225,7 @@ const createDirectories = async (
             return (post.pathString as string).startsWith(`/${directory}/`);
         });
 
-        if (postsInDirectory.length===0) return [];
+        if (postsInDirectory.length===0) return null;
 
         let prompt = "You are going to help me define and extract some information from the given document.\n";
         prompt += `This is a content that represent one single directory in a website, where all directories are related to eachother, the context and content of each can be different.`;
