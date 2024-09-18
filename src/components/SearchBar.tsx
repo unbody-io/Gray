@@ -123,7 +123,8 @@ export const SearchBar = ({onSearch, onClear}: SearchBarProps) => {
     const setSuggestion = (suggestion: string) => {
         console.log("suggestion", suggestion)
         setPrompt(suggestion);
-        handleSearch();
+        onSearch(suggestion);
+        setQuery(suggestion);
         pushQuery(suggestion);
     }
 
