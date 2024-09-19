@@ -31,7 +31,7 @@ export const CategoryList = ({categories, onOpen, onClosed}: CategoryListProps) 
     }
 
     return (
-        <div className={"relative"}>
+        <div className={"relative mb-12"}>
             {
                 <div className={"flex flex-col gap-16 transition-all duration-750 ease-in-out relative z-10"}
                      ref={ref}
