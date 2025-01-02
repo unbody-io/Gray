@@ -47,7 +47,7 @@ const DefaultsArticleCardBodyWithRefs = (props: ArticleCardProps) => {
                         }
                     </div>
                     <h4 className="font-normal text-md truncate pt-1 pb-1 max-w-fit whitespace-break-spaces">
-                        {article?.title as string}
+                        {article?.title as string} 
                     </h4>
                     <p className="overflow-clip text-gray-400 text-tiny max-w-lg">
                         {
@@ -58,7 +58,7 @@ const DefaultsArticleCardBodyWithRefs = (props: ArticleCardProps) => {
                 </div>
                 <div className={"col-span-2 relative"}>
                     <Button size={"sm"}
-                            href={getPostLink(article?.slug as string)}
+                            href={getPostLink(`article/${article?.slug}` as string)}
                             as={Link}
                             className={"absolute right-0 top-0"}
                             variant={"shadow"}

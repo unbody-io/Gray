@@ -163,6 +163,7 @@ export const DefaultVideoPlayer = ({ data, className = "", muxOptions={}, onTime
             className={clsx("relative w-full rounded-lg overflow-hidden", className)}
             {...rest}
             ref={wrapperRef}
+            onClick={togglePlay}
         >
             <PlayButton playing={playing} onClick={togglePlay} />
             <VideoWrapper playing={playing} isHovering={isHovering}>
